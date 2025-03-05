@@ -1,0 +1,9 @@
+__pycache__
+.env
+env
+*.sqlite3
+*.sqlite
+no_code_testing_app_server/static
+no_code_testing_app_server/media
+no_code_testing_app_server/logs
+no_code_testing_app_server/staticfiles

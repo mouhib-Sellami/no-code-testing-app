@@ -1,0 +1,76 @@
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-config/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - server_container
+    networks:
+      - app_network
+
+  server_container:
+    networks:
+      - app_network
+    build:
+      context: ./no_code_testing_app_server
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    volumes:
+      - ./no_code_testing_app_server:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    depends_on:
+      - minio
+      
+  minio:
+    networks:
+      - app_network
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_DEFAULT_BUCKETS: ${MINIO_DEFAULT_BUCKETS}
+
+    volumes:
+      - ./no_code_testing_app_server/minio_data:/data
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: always
+
+  create-bucket:
+    networks:
+    - app_network
+    image: minio/mc:latest
+    environment:
+      MC_HOST_minio: http://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@minio:9000
+    entrypoint:
+      - sh
+      - -c
+      - |
+        until mc ls minio > /dev/null 2>&1; do
+          sleep 0.5
+        done
+
+        mc mb minio/${MINIO_DEFAULT_BUCKETS}
+
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  minio_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+  postgres_data:

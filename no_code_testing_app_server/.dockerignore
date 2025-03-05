@@ -1,0 +1,11 @@
+__pycache__
+.env
+.env.example
+env
+*.sqlite3
+*.sqlite
+static
+static/**/*
+logs/**/*
+docker-compose.yaml
+Makefile
