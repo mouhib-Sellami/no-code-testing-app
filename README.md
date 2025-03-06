@@ -30,3 +30,7 @@ Before using this Makefile, ensure you have the following installed:
 | `make migration`    | Runs both `makemigrations` and `migrate` sequentially.                      |
 | `make deploy-server`| Runs migrations and collects static files for deployment.                   |
 | `make django`       | Runs a custom Django management command (e.g., `make django c="shell"`).    |
+
+
+## TODO
+* add grafana for monitoring mosquitto and app server (http , socket)

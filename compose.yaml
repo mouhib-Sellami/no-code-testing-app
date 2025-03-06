@@ -1,10 +1,9 @@
 services:
-
   nginx:
     image: nginx:latest
     container_name: nginx
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:80"
     volumes:
       - ./nginx-config/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
@@ -13,12 +12,13 @@ services:
       - app_network
 
   server_container:
+    container_name: server_container
     networks:
       - app_network
     build:
       context: ./no_code_testing_app_server
     ports:
-      - '8000:8000'
+      - "${SERVER_PORT}:8000"
     env_file:
       - .env
     volumes:
@@ -29,6 +29,7 @@ services:
       - minio
       
   minio:
+    container_name: minio
     networks:
       - app_network
     image: minio/minio
@@ -36,13 +37,12 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_DEFAULT_BUCKETS: ${MINIO_DEFAULT_BUCKETS}
-
     volumes:
-      - ./no_code_testing_app_server/minio_data:/data
+      - ./minio_data:/data
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
     restart: always
 
   create-bucket:
@@ -58,9 +58,24 @@ services:
         until mc ls minio > /dev/null 2>&1; do
           sleep 0.5
         done
-
         mc mb minio/${MINIO_DEFAULT_BUCKETS}
 
+  mosquitto:
+    build:
+      context: ./mosquitto
+      dockerfile: Dockerfile
+    environment:
+      - MOSQUITTO_USERNAME=${MOSQUITTO_USERNAME}
+      - MOSQUITTO_PASSWORD=${MOSQUITTO_PASSWORD}
+    image: eclipse-mosquitto:latest
+    container_name: eclipse-mosquitto
+    restart: always
+    volumes:
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    ports:
+      - "${MOSQUITTO_PORT}:1883"
+      - "${MOSQUITTO_WS_PORT}:8080"
 
 networks:
   app_network:
@@ -74,3 +89,5 @@ volumes:
   media_volume:
     driver: local
   postgres_data:
+  mqtt_web_data:
+    driver: local
