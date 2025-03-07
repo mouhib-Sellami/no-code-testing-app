@@ -34,3 +34,4 @@ Before using this Makefile, ensure you have the following installed:
 
 ## TODO
 * add grafana for monitoring mosquitto and app server (http , socket)
+* add jwks for emqx jwt verification
