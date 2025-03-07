@@ -60,22 +60,20 @@ services:
         done
         mc mb minio/${MINIO_DEFAULT_BUCKETS}
 
-  mosquitto:
-    build:
-      context: ./mosquitto
-      dockerfile: Dockerfile
-    environment:
-      - MOSQUITTO_USERNAME=${MOSQUITTO_USERNAME}
-      - MOSQUITTO_PASSWORD=${MOSQUITTO_PASSWORD}
-    image: eclipse-mosquitto:latest
-    container_name: eclipse-mosquitto
-    restart: always
-    volumes:
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+  emqx:
+    image: emqx/emqx:5.8.4
+    container_name: app-emqx-broker
+    env_file:
+      - .env
     ports:
-      - "${MOSQUITTO_PORT}:1883"
-      - "${MOSQUITTO_WS_PORT}:8080"
+      - "${EMQX_MQTT_TCP_PORT}:1883"
+      - "${EMQX_MQTT_SSL_PORT}:8883"
+      - "${EMQX_WS_PORT}:8083"
+      - "${EMQX_WSS_PORT}:8084"
+      - "${EMQX_DASHBOARD_PORT}:18083"
+    networks:
+      - app_network
+    restart: unless-stopped
 
 networks:
   app_network:
@@ -89,5 +87,3 @@ volumes:
   media_volume:
     driver: local
   postgres_data:
-  mqtt_web_data:
-    driver: local
