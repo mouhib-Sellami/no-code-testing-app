@@ -26,12 +26,14 @@ SECRET_KEY = 'django-insecure-+j-pt^=-&*35ywahg#&aoz--@coos#+l&y_wg^@^xe)h#fpc7z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+if DEBUG:
+    SESSION_COOKIE_DOMAIN = None
+else:
+    SESSION_COOKIE_DOMAIN = '.localhost'
+
 ALLOWED_HOSTS = ['*']
 
-
-# Application definition
-
-INSTALLED_APPS = [
+SHARED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +45,31 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'app_backend'
+    'django_tenants',
+    'tenant_users.tenants',
+    'tenant_users.permissions',
+    'app_backend',
+    'app_tenant',
+    'app_user_auth'
+]
+
+TENANT_APPS = [
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'tenant_users.permissions',
+    'app_backend',
+]
+
+INSTALLED_APPS = list(SHARED_APPS) + [
+    app for app in TENANT_APPS if app not in SHARED_APPS
+]
+
+# TENANT CONFIGURATION
+TENANT_MODEL = "app_tenant.Tenant"
+TENANT_DOMAIN_MODEL = "app_tenant.Domain"
+
+DATABASE_ROUTERS = [
+    'django_tenants.routers.TenantSyncRouter',
 ]
 
 GRAPH_MODELS = {
@@ -52,18 +78,31 @@ GRAPH_MODELS = {
 }
 
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'tenant_users.tenants.middleware.TenantAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
+# SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+
+AUTHENTICATION_BACKENDS = [
+    'tenant_users.permissions.backend.UserBackend',
+]
+
+AUTH_USER_MODEL = 'app_user_auth.TenantUser'
+
 ROOT_URLCONF = 'no_code_testing_app_server.urls'
+
+PUBLIC_SCHEMA_URLCONF = 'no_code_testing_app_server.urls_public'
+
+TENANT_USERS_ACCESS_ERROR_MESSAGE = "You do not have access to this tenant."
 
 TEMPLATES = [
     {
@@ -96,11 +135,11 @@ WSGI_APPLICATION = 'no_code_testing_app_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': os.environ['POSTGRES_DB'],
         'USER': os.environ['POSTGRES_USER'],
         'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-        'HOST': os.environ['POSTGRES_HOST'],
+        'HOST': 'localhost',  # os.environ['POSTGRES_HOST'],
         'PORT': os.environ['POSTGRES_PORT'],
     }
 }
