@@ -13,7 +13,7 @@ class TenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tenant
-        fields = ('id', 'name', 'slug', 'domain', 'created_at', 'updated_at')
+        fields = '__all__'
 
     def get_domain(self, obj):
         domain = obj.domain_set.all().first()

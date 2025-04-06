@@ -57,6 +57,7 @@ deploy-server:
 	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared
 	@$(DJANGO_PYTHON) manage.py collectstatic
 	@$(DJANGO_PYTHON) manage.py create_public_tenant --domain_url localhost --owner_email admin@domain.com
+	@$(DJANGO_PYTHON) manage.py create_tenant_superuser --username=root --schema=public
 
 django:
 	@$(eval c ?=)

@@ -11,6 +11,15 @@ class UserLoginSerializer(serializers.Serializer):
         fields = ('username', 'password',)
 
 
+class UserSignUpSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = ('username', 'password', 'email')
+
+
 class BaseUserSerializer(serializers.ModelSerializer):
     organization = serializers.SerializerMethodField('get_user_tenant')
 
