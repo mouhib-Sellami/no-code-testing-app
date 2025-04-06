@@ -11,11 +11,9 @@ from rest_framework import status
 from app_user_auth import models
 from rest_framework.exceptions import ValidationError
 from django_tenants.utils import schema_context, get_public_schema_name
-from rest_framework import permissions
 
-logger = logging.getLogger('brain_morph')
+logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
-
 
 class AuthViewSet(GenericViewSet):
 
@@ -51,6 +49,37 @@ class AuthViewSet(GenericViewSet):
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
 
     @schema_context(get_public_schema_name())
+    @action(detail=False, methods=['POST'], url_path='signup', serializer_class=serializers.UserSignupViewSerializer)
+    def signup_(self, request):
+        try:
+            user_data: dict = request.data
+            user = serializers.UserSignupViewSerializer(data=user_data)
+            user.is_valid(raise_exception=True)
+            user: models.TenantUser = user.save()
+            user.set_password(request.data['password'])
+            user.save(update_fields=['password'])
+            login(request, user)
+            token = Token.objects.get_or_create(user=user)
+            return HttpResponse(
+                json.dumps(
+                    {
+                        'token': token[0].key,
+                        'user': serializers.BaseUserSerializer(user).data,
+                        # 'permissions': serializers.AppPermissionSerializer(user.user_org_member.first().role.permissions.all(), many=True).data,
+                    }
+                ),
+                status=status.HTTP_200_OK,
+                content_type=CONTENT_TYPE,
+            )
+        except ValidationError as v:
+            logger.exception(str(v))
+            return HttpResponse(json.dumps(v.__dict__), status=status.HTTP_422_UNPROCESSABLE_ENTITY, content_type=CONTENT_TYPE)
+
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+    @schema_context(get_public_schema_name())
     @action(detail=False, methods=['POST'])
     def logout(self, request):
         try:
@@ -59,27 +88,26 @@ class AuthViewSet(GenericViewSet):
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
-
-    # @action(
-    #     detail=False, methods=['GET'], url_path='retrieve', permission_classes=[IsAuthenticated]
-    # )
-    # def get_auth(self, request):
-    #     try:
-    #         return HttpResponse(
-    #             json.dumps(
-    #                 {
-    #                     'token': request.auth.key,
-    #                     'user': serializers.UserSerializer(request.user).data,
-    #                     'permissions': serializers.AppPermissionSerializer(request.user.role.permissions.all(), many=True).data,
-
-    #                 }
-    #             ),
-    #             status=status.HTTP_200_OK,
-    #             content_type=CONTENT_TYPE,
-    #         )
-    #     except Exception as e:
-    #         logger.exception(str(e))
-    #         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+        
+    @schema_context(get_public_schema_name())
+    @action(
+        detail=False, methods=['GET'], url_path='retrieve', permission_classes=[IsAuthenticated]
+    )
+    def get_auth(self, request):
+        try:
+            return HttpResponse(
+                json.dumps(
+                    {
+                        'token': request.auth.key,
+                        'user': serializers.BaseUserSerializer(request.user).data,
+                    }
+                ),
+                status=status.HTTP_200_OK,
+                content_type=CONTENT_TYPE,
+            )
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
 
     # @action(detail=False, url_path='find/email', methods=['POST'])
     # def find_email(self, request):
