@@ -11,9 +11,11 @@ from rest_framework import status
 from app_user_auth import models
 from rest_framework.exceptions import ValidationError
 from django_tenants.utils import schema_context, get_public_schema_name
+from rest_framework import permissions
 
 logger = logging.getLogger('brain_morph')
 CONTENT_TYPE = 'application/json'
+
 
 class AuthViewSet(GenericViewSet):
 
@@ -48,14 +50,15 @@ class AuthViewSet(GenericViewSet):
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
 
-    # @action(detail=False, methods=['POST'])
-    # def logout(self, request):
-    #     try:
-    #         if request.auth.delete():
-    #             return HttpResponse(status=status.HTTP_204_NO_CONTENT, content_type=CONTENT_TYPE)
-    #     except Exception as e:
-    #         logger.exception(str(e))
-    #         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+    @schema_context(get_public_schema_name())
+    @action(detail=False, methods=['POST'])
+    def logout(self, request):
+        try:
+            if request.auth.delete():
+                return HttpResponse(status=status.HTTP_204_NO_CONTENT, content_type=CONTENT_TYPE)
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
 
     # @action(
     #     detail=False, methods=['GET'], url_path='retrieve', permission_classes=[IsAuthenticated]
