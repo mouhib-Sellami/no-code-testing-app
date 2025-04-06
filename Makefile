@@ -49,6 +49,7 @@ migrate:
 
 migration:
 	@$(DJANGO_PYTHON) manage.py makemigrations
+	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared
 	@$(DJANGO_PYTHON) manage.py migrate
 
 deploy-server:

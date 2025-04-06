@@ -13,7 +13,7 @@ class Tenant(TenantBase, BaseModel):
 
 class Domain(BaseModel):
     domain = models.CharField(max_length=100)
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE,related_name="domain_set")
     is_primary = models.BooleanField(default=True)
 
     def __str__(self):

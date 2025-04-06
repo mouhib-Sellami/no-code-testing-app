@@ -19,8 +19,10 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from no_code_testing_app_server.api_docs import urls
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('logs/', include('log_viewer.urls')),
+    path('api/', include('app_user_auth.urls'))
 ] + urls + static(settings.STATIC_URL,
                   document_root=settings.STATIC_ROOT)
