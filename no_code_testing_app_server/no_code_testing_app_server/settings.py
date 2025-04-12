@@ -53,7 +53,7 @@ SHARED_APPS = [
     'tenant_users.tenants',
     'tenant_users.permissions',
     'app_tenant',
-    'app_user_auth'
+    'app_user_auth',
 ]
 
 TENANT_APPS = [
