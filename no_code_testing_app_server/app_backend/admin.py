@@ -4,6 +4,5 @@ from . import models
 
 admin.site.register(models.Project)
 admin.site.register(models.User)
-admin.site.register(models.Organization)
 admin.site.register(models.OrgRole)
 admin.site.register(models.AppPermission)

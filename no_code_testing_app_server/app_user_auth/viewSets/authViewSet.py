@@ -11,9 +11,11 @@ from rest_framework import status
 from app_user_auth import models
 from rest_framework.exceptions import ValidationError
 from django_tenants.utils import schema_context, get_public_schema_name
+from no_code_testing_app_server.utils.userFormatter import formateUserObject
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
+
 
 class AuthViewSet(GenericViewSet):
 
@@ -26,14 +28,11 @@ class AuthViewSet(GenericViewSet):
             if user is not None and user.is_active:
                 login(request, user)
                 token = Token.objects.get_or_create(user=user)
+                user_obj = formateUserObject(user)
+                user_obj.update({'token': token[0].key})
                 return HttpResponse(
                     json.dumps(
-                        {
-                            'token': token[0].key,
-                            'user': serializers.BaseUserSerializer(user).data,
-                            # 'permissions': serializers.AppPermissionSerializer(user.role.permissions.all(), many=True).data,
-
-                        }
+                        user_obj
                     ),
                     status=status.HTTP_200_OK,
                     content_type=CONTENT_TYPE,
@@ -60,13 +59,11 @@ class AuthViewSet(GenericViewSet):
             user.save(update_fields=['password'])
             login(request, user)
             token = Token.objects.get_or_create(user=user)
+            user_obj = formateUserObject(user)
+            user_obj.update({'token': token[0].key})
             return HttpResponse(
                 json.dumps(
-                    {
-                        'token': token[0].key,
-                        'user': serializers.BaseUserSerializer(user).data,
-                        # 'permissions': serializers.AppPermissionSerializer(user.user_org_member.first().role.permissions.all(), many=True).data,
-                    }
+                    user_obj
                 ),
                 status=status.HTTP_200_OK,
                 content_type=CONTENT_TYPE,
@@ -88,19 +85,18 @@ class AuthViewSet(GenericViewSet):
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
-        
+
     @schema_context(get_public_schema_name())
     @action(
         detail=False, methods=['GET'], url_path='retrieve', permission_classes=[IsAuthenticated]
     )
     def get_auth(self, request):
         try:
+            user_obj = formateUserObject(request.user)
+            user_obj.update({'token': request.auth.key})
             return HttpResponse(
                 json.dumps(
-                    {
-                        'token': request.auth.key,
-                        'user': serializers.BaseUserSerializer(request.user).data,
-                    }
+                    user_obj
                 ),
                 status=status.HTTP_200_OK,
                 content_type=CONTENT_TYPE,

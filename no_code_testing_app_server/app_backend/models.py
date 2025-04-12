@@ -4,13 +4,9 @@ from no_code_testing_app_server.utils.modelValidate import validate_image_extens
 from app_user_auth import models as authModels
 from app_tenant import models as tenantModels
 
+
 class Project(BaseModel):
     name = models.CharField(max_length=255)
-
-class Organization(tenantModels.Tenant):
-
-    def __str__(self) -> str:
-        return self.name
 
 
 class AppPermission(BaseModel):
@@ -19,6 +15,7 @@ class AppPermission(BaseModel):
 
     def __str__(self) -> str:
         return self.label
+
 
 class OrgRole(BaseModel):
     name = models.CharField(max_length=255, default='', null=True, blank=True)
@@ -31,11 +28,12 @@ class OrgRole(BaseModel):
     def __str__(self) -> str:
         return self.name
 
+
 class User(BaseModel):
     user = models.OneToOneField(
-        authModels.TenantUser, on_delete=models.CASCADE, related_name='user_projects', null=True)
-    first_name = models.CharField(max_length=255, null=False, blank=False)
-    last_name = models.CharField(max_length=255, null=False, blank=False)
-    profession = models.CharField(max_length=255, null=False, blank=False)
+        authModels.TenantUser, on_delete=models.DO_NOTHING, related_name='app_user', null=True)
+    first_name = models.CharField(max_length=255, null=True, blank=False)
+    last_name = models.CharField(max_length=255, null=True, blank=False)
+    profession = models.CharField(max_length=255, null=True, blank=False)
     role = models.ForeignKey(
         OrgRole, on_delete=models.CASCADE, related_name="role_org_member")

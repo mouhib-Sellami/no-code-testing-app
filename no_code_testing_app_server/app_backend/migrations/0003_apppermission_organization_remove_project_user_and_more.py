@@ -66,7 +66,6 @@ class Migration(migrations.Migration):
                 ('last_name', models.CharField(max_length=255)),
                 ('profession', models.CharField(max_length=255)),
                 ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='role_org_member', to='app_backend.orgrole')),
-                ('user', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='user_projects', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
