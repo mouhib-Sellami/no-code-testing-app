@@ -1,8 +1,6 @@
 from django.db import models
 from no_code_testing_app_server.utils.BaseModel import BaseModel
-from no_code_testing_app_server.utils.modelValidate import validate_image_extension
 from app_user_auth import models as authModels
-from app_tenant import models as tenantModels
 
 
 class Project(BaseModel):
