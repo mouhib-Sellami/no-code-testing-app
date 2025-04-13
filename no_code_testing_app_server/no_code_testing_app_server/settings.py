@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from no_code_testing_app_server.drf_config import *
+from .logger import LOGGING
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,12 +27,15 @@ SECRET_KEY = 'django-insecure-+j-pt^=-&*35ywahg#&aoz--@coos#+l&y_wg^@^xe)h#fpc7z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ALLOWED_HOSTS = ['*']
+LOGGING = LOGGING
+os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
+
 if DEBUG:
     SESSION_COOKIE_DOMAIN = None
 else:
     SESSION_COOKIE_DOMAIN = '.localhost'
 
-ALLOWED_HOSTS = ['*']
 
 SHARED_APPS = [
     'django.contrib.admin',
@@ -48,9 +52,8 @@ SHARED_APPS = [
     'django_tenants',
     'tenant_users.tenants',
     'tenant_users.permissions',
-    'app_backend',
     'app_tenant',
-    'app_user_auth'
+    'app_user_auth',
 ]
 
 TENANT_APPS = [
@@ -82,9 +85,9 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'tenant_users.tenants.middleware.TenantAccessMiddleware',
+    'no_code_testing_app_server.middlewares.TenantAccessMiddleware.TenantAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -95,6 +98,12 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = [
     'tenant_users.permissions.backend.UserBackend',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'no_code_testing_app_server.auth.BearerTokenAuth.BearerTokenAuth',
+    ]
+}
 
 AUTH_USER_MODEL = 'app_user_auth.TenantUser'
 
@@ -139,7 +148,7 @@ DATABASES = {
         'NAME': os.environ['POSTGRES_DB'],
         'USER': os.environ['POSTGRES_USER'],
         'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-        'HOST': 'localhost',  # os.environ['POSTGRES_HOST'],
+        'HOST': os.environ['POSTGRES_HOST'],
         'PORT': os.environ['POSTGRES_PORT'],
     }
 }
