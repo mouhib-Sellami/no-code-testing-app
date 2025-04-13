@@ -1,0 +1,3 @@
+[submodule "no-code-testing-app-front"]
+	path = no-code-testing-app-front
+	url = git@github.com:UM-org/no-code-testing-app-front.git

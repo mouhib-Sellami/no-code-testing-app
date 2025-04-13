@@ -30,7 +30,6 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, null=True)),
                 ('updated_at', models.DateTimeField(auto_now=True, null=True)),
                 ('name', models.CharField(editable=False, max_length=255, unique=True)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('email', models.CharField(blank=True, default='', max_length=255, null=True, unique=True)),
                 ('org_pic', models.FileField(blank=True, default=None, max_length=500, null=True, upload_to=app_tenant.models.Tenant.generate_upload_path, validators=[no_code_testing_app_server.utils.modelValidate.validate_image_extension])),
             ],
