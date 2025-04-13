@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app_user_auth.urls')),
     path('api/', include('app_backend.urls')),
+    path('api/', include('app_tenant.urls')),
 ]  + static(settings.STATIC_URL,
                   document_root=settings.STATIC_ROOT)

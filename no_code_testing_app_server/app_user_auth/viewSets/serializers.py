@@ -4,7 +4,7 @@ from rest_framework import serializers
 from app_backend import models as appModels
 from django.contrib.auth import get_user_model
 from django_tenants.utils import tenant_context
-from app_tenant import serializers as TenantSerializers
+from app_tenant.viewSets import serializers as TenantSerializers
 from app_backend.viewSets import serializers as AppBackendSerializer
 
 logger = logging.getLogger('no_code_testing_app')

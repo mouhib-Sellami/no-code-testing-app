@@ -27,14 +27,14 @@ SECRET_KEY = 'django-insecure-+j-pt^=-&*35ywahg#&aoz--@coos#+l&y_wg^@^xe)h#fpc7z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*',"*.localhost"]
 LOGGING = LOGGING
 os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
 
 if DEBUG:
     SESSION_COOKIE_DOMAIN = None
 else:
-    SESSION_COOKIE_DOMAIN = '.localhost'
+    SESSION_COOKIE_DOMAIN = '*.localhost'
 
 
 SHARED_APPS = [
