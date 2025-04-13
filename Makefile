@@ -1,10 +1,6 @@
 DJANGO_CONTAINER_NAME = server_container
-REACT_CONTAINER_NAME = web_app
-REACT_DEV_CONTAINER_NAME = react-dev
 
 DJANGO_CONTAINER = $(DOCKER_COMPOSE) exec $(DJANGO_CONTAINER_NAME)
-REACT_CONTAINER = $(DOCKER_COMPOSE) exec $(REACT_CONTAINER_NAME)
-REACT_DEV_CONTAINER = $(DOCKER_COMPOSE) exec $(REACT_DEV_CONTAINER_NAME)
 
 DJANGO_PYTHON = @$(DJANGO_CONTAINER) python3
 
@@ -13,16 +9,12 @@ DJANGO_MANAGER = @$(DJANGO_PYTHON) manage.py
 DOCKER_COMPOSE = docker-compose
 
 DOCKER_COMPOSE_FILE = compose.yaml
-REACT_DOCKER_COMPOSE_FILE = ./no-code-testing-app-front/compose.yaml
 
 up:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up $(c)
 
 build:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build $(c)
-
-dev-web:
-	@$(DOCKER_COMPOSE) -f $(REACT_DOCKER_COMPOSE_FILE) up -d react-dev $(c)
 
 start:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d $(c)
@@ -48,12 +40,6 @@ clean: confirm
 
 sh:
 	@$(DJANGO_CONTAINER) sh
-
-sh-web:
-	@$(REACT_CONTAINER) sh
-
-sh-web-dev:
-	@$(REACT_DEV_CONTAINER) sh
 
 make-migrations:
 	@$(DJANGO_PYTHON) manage.py makemigrations
