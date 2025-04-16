@@ -5,7 +5,7 @@ from . import serializers
 from rest_framework.permissions import IsAuthenticated
 from app_backend import models
 
-logger = logging.getLogger('sky_forge')
+logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
 class ProjectModelViewSet(ModelViewSet):
