@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 logger = logging.getLogger('no_code_testing_app')
 
+
 class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -34,6 +35,12 @@ class AppPermissionSerializer(serializers.ModelSerializer):
 class OrgRoleReadSerializer(serializers.ModelSerializer):
     permissions = AppPermissionSerializer(many=True)
 
+    class Meta:
+        model = models.OrgRole
+        fields = '__all__'
+
+
+class OrgRoleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OrgRole
         fields = '__all__'

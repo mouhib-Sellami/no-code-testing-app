@@ -17,17 +17,17 @@ def create_base_roles(apps, _):
     app_permissions = generate_permissions(
         ['project', 'user', 'role', 'organization'], Permission)
 
-    owner, _ = Role.objects.get_or_create(name='Owner')
+    owner, _ = Role.objects.get_or_create(name='Owner', can_delete=False)
     owner_permissions_qs = app_permissions
     owner.permissions.set(owner_permissions_qs)
 
-    admin, _ = Role.objects.get_or_create(name='Admin')
+    admin, _ = Role.objects.get_or_create(name='Admin', can_delete=False)
     admin_permissions_qs = app_permissions.exclude(
         label__icontains="organization".upper()).exclude(
         label__icontains="orgRole".upper())
     admin.permissions.set(admin_permissions_qs)
 
-    staff, _ = Role.objects.get_or_create(name='Staff')
+    staff, _ = Role.objects.get_or_create(name='Staff', can_delete=False)
     staff_permissions_qs = app_permissions.exclude(label__icontains="organization".upper(
     )).exclude(label__icontains="user".upper()).exclude(label__icontains="orgrole".upper())
     staff.permissions.set(staff_permissions_qs)
@@ -38,10 +38,12 @@ def reverse_create_base_roles(apps, _):
     app_permissions = apps.get_model('app_backend', 'AppPermission')
     Role.objects.filter(name__in=['Owner', 'Admin', 'Staff']).delete()
     app_permissions.objects.all().delete()
-    
+
+
 class Migration(migrations.Migration):
 
-    replaces = [('app_backend', '0004_base_permissions_roles'), ('app_backend', '0005_alter_user_first_name_alter_user_last_name_and_more'), ('app_backend', '0006_delete_organization'), ('app_backend', '0007_user_user')]
+    replaces = [('app_backend', '0004_base_permissions_roles'), ('app_backend', '0005_alter_user_first_name_alter_user_last_name_and_more'),
+                ('app_backend', '0006_delete_organization'), ('app_backend', '0007_user_user')]
 
     dependencies = [
         ('app_backend', '0003_apppermission_organization_remove_project_user_and_more'),
@@ -49,7 +51,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-       migrations.RunPython(
+        migrations.RunPython(
             code=create_base_roles,
             reverse_code=reverse_create_base_roles,
         ),
@@ -74,6 +76,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='user',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='app_user', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING,
+                                       related_name='app_user', to=settings.AUTH_USER_MODEL),
         ),
     ]

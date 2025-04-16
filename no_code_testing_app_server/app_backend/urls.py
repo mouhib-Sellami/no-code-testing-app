@@ -4,10 +4,12 @@ from django.conf.urls.static import static
 from rest_framework.routers import SimpleRouter
 from app_backend.viewSets.ProjectModelViewSet import ProjectModelViewSet
 from app_backend.viewSets.PermissionViewSet import PermissionViewSet
+from app_backend.viewSets.RoleModelViewSet import RoleModelViewSet
 
 router = SimpleRouter()
 router.register(r"projects", ProjectModelViewSet, basename="projects")
-router.register(r"permissions", PermissionViewSet, basename="permission")
+router.register(r"permissions", PermissionViewSet, basename="permissions")
+router.register(r"roles", RoleModelViewSet, basename="roles")
 
 urlpatterns = [
     path("", include(router.urls)),
