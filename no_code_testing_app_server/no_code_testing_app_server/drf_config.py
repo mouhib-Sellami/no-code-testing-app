@@ -14,7 +14,7 @@ APPEND_SLASH = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'no_code_testing_app_server.auth.BearerTokenAuth.BearerTokenAuth',
-    ]
+    ],
 }
 
 REST_FRAMEWORK = {

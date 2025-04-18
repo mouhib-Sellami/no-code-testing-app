@@ -12,12 +12,14 @@ from app_user_auth import models
 from rest_framework.exceptions import ValidationError
 from django_tenants.utils import schema_context, get_public_schema_name
 from no_code_testing_app_server.utils.userFormatter import formateUserObject
+from rest_framework.permissions import AllowAny
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
 
 class AuthViewSet(GenericViewSet):
+    permission_classes = [AllowAny]
 
     @schema_context(get_public_schema_name())
     @action(detail=False, methods=['POST'], url_path='login', serializer_class=serializers.UserLoginSerializer)
