@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django_tenants.utils import tenant_context
 from app_tenant.viewSets import serializers as TenantSerializers
 from app_backend.viewSets import serializers as AppBackendSerializer
+from django.core.validators import RegexValidator
 
 logger = logging.getLogger('no_code_testing_app')
 
@@ -145,7 +146,13 @@ class UserSignupViewSerializer(serializers.ModelSerializer):
 
 
 class ForgetPasswordRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    email = serializers.EmailField(validators=[
+        RegexValidator(
+            regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+            message='Enter a valid email address.',
+            code='invalid_email'
+        )
+    ])
 
     class Meta:
         fields = ('email',)

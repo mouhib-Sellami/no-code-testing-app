@@ -15,6 +15,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import IsAuthenticated
 from django_tenants.utils import schema_context, get_public_schema_name
 from no_code_testing_app_server.utils.userFormatter import formateUserObject
+from engine_app.views import mailing_engine
+from engine_app import models as appEngineModels
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
@@ -113,14 +115,26 @@ class AuthViewSet(GenericViewSet):
     @action(detail=False, url_path='find/email', methods=['POST'], serializer_class=serializers.ForgetPasswordRequestSerializer)
     def find_email(self, request):
         try:
-            user = models.TenantUser.objects.get(email=request.data['email'])
+            serializer = serializers.ForgetPasswordRequestSerializer(
+                data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            email = serializer.validated_data['email']
+            user = models.TenantUser.objects.get(
+                email=email)
             user.reset_token = secrets.token_urlsafe()
             user.save(update_fields=['reset_token'])
-            # send_email(ForgetPassword(email=user.email,
-            #            first_name=user.first_name, token=user.reset_token))
+            job = appEngineModels.MailJobs.objects.create(
+                receiver=user, type=appEngineModels.MailJobs.EmailTypes.RESET_PASSWORD)
+            mailing_engine.add_task(
+                job=job, delete_when_finish=False, new=True)
+        except ValidationError as v:
+            logger.exception(str(v))
+            return HttpResponse(json.dumps(v.__dict__), status=status.HTTP_422_UNPROCESSABLE_ENTITY, content_type=CONTENT_TYPE)
         except ObjectDoesNotExist:
             pass
-            return HttpResponse(status=status.HTTP_201_CREATED, content_type=CONTENT_TYPE)
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+        return HttpResponse(status=status.HTTP_201_CREATED, content_type=CONTENT_TYPE)
