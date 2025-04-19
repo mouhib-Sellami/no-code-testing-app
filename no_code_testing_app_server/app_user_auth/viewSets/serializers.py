@@ -59,6 +59,14 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'user'
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        extra_fields = self.context.get('extra_fields', [])
+        for field in extra_fields:
+            if field not in self.fields:
+                self.fields[field] = serializers.CharField(
+                    read_only=True, default='')
+
     def get_tenant_user(self, obj):
         try:
             tenant = obj.tenants.all().first()
@@ -134,3 +142,10 @@ class UserSignupViewSerializer(serializers.ModelSerializer):
         except Exception as e:
             logger.exception(str(e))
         return user
+
+
+class ForgetPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = ('email',)
