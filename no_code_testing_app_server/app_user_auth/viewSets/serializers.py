@@ -7,7 +7,7 @@ from django_tenants.utils import tenant_context
 from app_tenant.viewSets import serializers as TenantSerializers
 from app_backend.viewSets import serializers as AppBackendSerializer
 from django.core.validators import RegexValidator
-
+from no_code_testing_app_server.utils import verify_token_expiration
 logger = logging.getLogger('no_code_testing_app')
 
 
@@ -156,3 +156,36 @@ class ForgetPasswordRequestSerializer(serializers.Serializer):
 
     class Meta:
         fields = ('email',)
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=255, required=True)
+    password = serializers.CharField(
+        max_length=128, write_only=True, required=True)
+    confirm_password = serializers.CharField(
+        max_length=128, write_only=True, required=True)
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+
+            raise serializers.ValidationError(
+                {"confirm_password": "Passwords do not match."})
+
+        if verify_token_expiration(data['token']):
+            raise serializers.ValidationError({"token": "Token is expired."})
+        else:
+            user = models.TenantUser.objects.filter(
+                reset_token=data['token']).first()
+            if user == None:
+                raise serializers.ValidationError(
+                    {"token": "Token is expired."})
+            data['user'] = user
+        return data
+
+    def save(self):
+        user = self.validated_data['user']
+        password = self.validated_data['password']
+        user.set_password(password)
+        user.reset_token = None
+        user.save()
+        return user
