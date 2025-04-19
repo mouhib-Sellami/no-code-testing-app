@@ -138,6 +138,6 @@ def get_email(receiver, *args, **kwargs):
         'FromEmail': os.environ['MAIL_JET_FROM_EMAIL'],
         'FromName': 'No code app support',
         'Subject': 'Reset password',
-        'Html-part': f'{prepare_core(first_name = first_name,link=SKY_FORGE_APP_URL+"/forget/password/"+reset_token)}',
+        'Html-part': f'{prepare_core(first_name = first_name,link=SKY_FORGE_APP_URL+"/reset/password/"+reset_token)}',
         'Recipients': [{'Email': f'{receiver}'}],
     }
