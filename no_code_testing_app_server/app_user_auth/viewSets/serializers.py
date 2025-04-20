@@ -91,10 +91,13 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
 class UserSignupViewSerializer(serializers.ModelSerializer):
     organization = TenantSerializers.OrganizationSignUpSerializer()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
 
     class Meta:
         model = models.TenantUser
-        fields = ('username', 'email', 'password', 'organization')
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'password', 'organization')
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -121,6 +124,8 @@ class UserSignupViewSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         org_data = validated_data.pop('organization')
+        first_name = validated_data.pop('first_name')
+        last_name = validated_data.pop('last_name')
         org_serializer = TenantSerializers.OrganizationSignUpSerializer(
             data=org_data)
         org_serializer.is_valid(raise_exception=True)
@@ -132,13 +137,14 @@ class UserSignupViewSerializer(serializers.ModelSerializer):
         tenant.owner = user
         tenant.save(update_fields=['owner'])
         user.tenants.add(tenant)
-        # tenant_organization: appModels.Organization = tenant
         try:
             with tenant_context(tenant):
                 tenant_user: appModels.User = appModels.User()
                 tenant_user.role = appModels.OrgRole.objects.filter(
                     name="Owner").first()
                 tenant_user.user = user
+                tenant_user.first_name = first_name
+                tenant_user.last_name = last_name
                 tenant_user.save()
         except Exception as e:
             logger.exception(str(e))

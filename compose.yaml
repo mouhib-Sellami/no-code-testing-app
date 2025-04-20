@@ -59,7 +59,7 @@ services:
     volumes:
       - ./no_code_testing_app_server:/app
       - static_volume:/app/static
-      - media_volume:/app/media
+      - ./no_code_testing_app_server/media:/app/media
     depends_on:
       - minio
       - postgres

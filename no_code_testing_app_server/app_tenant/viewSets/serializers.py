@@ -44,7 +44,7 @@ class OrganizationSignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tenant
-        fields = ('name', 'email')
+        fields = ('name', 'email','org_pic')
 
     def validate_name(self, value):
         slug = slugify(value, allow_unicode=False)
