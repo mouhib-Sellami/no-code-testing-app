@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from engine_app import models as appEngineModels
 from rest_framework.authtoken.models import Token
 from rest_framework.viewsets import GenericViewSet
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rest_framework.exceptions import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import IsAuthenticated
@@ -86,11 +86,13 @@ class AuthViewSet(GenericViewSet):
     @action(detail=False, methods=['POST'])
     def logout(self, request):
         try:
-            if request.auth.delete():
-                return HttpResponse(status=status.HTTP_204_NO_CONTENT, content_type=CONTENT_TYPE)
+            logout(request)
+            request.session.flush()
+            request.auth.delete()
         except Exception as e:
             logger.exception(str(e))
-            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+        finally:
+            return HttpResponse(status=status.HTTP_204_NO_CONTENT, content_type=CONTENT_TYPE)
 
     @schema_context(get_public_schema_name())
     @action(
