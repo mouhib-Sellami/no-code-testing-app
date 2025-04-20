@@ -1,0 +1,9 @@
+from no_code_testing_app_server.config.singleton_config.Singleton import singleton
+from engine.core.Engine import Engine
+from engine.conf import TASK_TYPE
+
+
+@singleton
+class MailingEngine(Engine):
+    def __init__(self):
+        super().__init__(task_type=TASK_TYPE.mail)

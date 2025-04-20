@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from no_code_testing_app_server.drf_config import *
+from no_code_testing_app_server.config.drf_config import *
+from no_code_testing_app_server.config.workers_config import *
 from .logger import LOGGING
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -54,6 +57,8 @@ SHARED_APPS = [
     'tenant_users.permissions',
     'app_tenant',
     'app_user_auth',
+    'engine',
+    'engine_app'
 ]
 
 TENANT_APPS = [
@@ -211,6 +216,8 @@ LOGS = os.path.join(BASE_DIR, 'logs')
 make_dir_path(os.path.join(BASE_DIR, "static"))
 make_dir_path(LOGS)
 make_dir_path(MEDIA_ROOT)
+
+APP_LOGO = os.path.join(MEDIA_ROOT, 'logo.png')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

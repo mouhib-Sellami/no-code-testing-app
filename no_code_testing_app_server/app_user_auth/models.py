@@ -2,7 +2,6 @@ from django.db import models
 from no_code_testing_app_server.utils.BaseModel import BaseModel
 from tenant_users.tenants.models import UserProfile, UserProfileManager
 
-
 class UserManager(UserProfileManager):
     def create_superuser(self, username, email, password):
         user = self.create_user(
@@ -25,6 +24,9 @@ class TenantUser(UserProfile, BaseModel):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    reset_token = models.CharField(
+        default='', max_length=255, null=True, blank=True)
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 

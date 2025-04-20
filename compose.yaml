@@ -59,7 +59,7 @@ services:
     volumes:
       - ./no_code_testing_app_server:/app
       - static_volume:/app/static
-      - media_volume:/app/media
+      - ./no_code_testing_app_server/media:/app/media
     depends_on:
       - minio
       - postgres
@@ -72,7 +72,7 @@ services:
     env_file:
       - ./no-code-testing-app-front/.env.production
     ports:
-      - "8088:80"
+      - "88:88"
     depends_on:
       - server_container
     networks:

@@ -6,7 +6,8 @@ from django.contrib.auth import get_user_model
 from django_tenants.utils import tenant_context
 from app_tenant.viewSets import serializers as TenantSerializers
 from app_backend.viewSets import serializers as AppBackendSerializer
-
+from django.core.validators import RegexValidator
+from no_code_testing_app_server.utils import verify_token_expiration
 logger = logging.getLogger('no_code_testing_app')
 
 
@@ -59,6 +60,14 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'user'
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        extra_fields = self.context.get('extra_fields', [])
+        for field in extra_fields:
+            if field not in self.fields:
+                self.fields[field] = serializers.CharField(
+                    read_only=True, default='')
+
     def get_tenant_user(self, obj):
         try:
             tenant = obj.tenants.all().first()
@@ -82,10 +91,13 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
 class UserSignupViewSerializer(serializers.ModelSerializer):
     organization = TenantSerializers.OrganizationSignUpSerializer()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
 
     class Meta:
         model = models.TenantUser
-        fields = ('username', 'email', 'password', 'organization')
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'password', 'organization')
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -112,6 +124,8 @@ class UserSignupViewSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         org_data = validated_data.pop('organization')
+        first_name = validated_data.pop('first_name')
+        last_name = validated_data.pop('last_name')
         org_serializer = TenantSerializers.OrganizationSignUpSerializer(
             data=org_data)
         org_serializer.is_valid(raise_exception=True)
@@ -123,14 +137,61 @@ class UserSignupViewSerializer(serializers.ModelSerializer):
         tenant.owner = user
         tenant.save(update_fields=['owner'])
         user.tenants.add(tenant)
-        # tenant_organization: appModels.Organization = tenant
         try:
             with tenant_context(tenant):
                 tenant_user: appModels.User = appModels.User()
                 tenant_user.role = appModels.OrgRole.objects.filter(
                     name="Owner").first()
                 tenant_user.user = user
+                tenant_user.first_name = first_name
+                tenant_user.last_name = last_name
                 tenant_user.save()
         except Exception as e:
             logger.exception(str(e))
+        return user
+
+
+class ForgetPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(validators=[
+        RegexValidator(
+            regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+            message='Enter a valid email address.',
+            code='invalid_email'
+        )
+    ])
+
+    class Meta:
+        fields = ('email',)
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=255, required=True)
+    password = serializers.CharField(
+        max_length=128, write_only=True, required=True)
+    confirm_password = serializers.CharField(
+        max_length=128, write_only=True, required=True)
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+
+            raise serializers.ValidationError(
+                {"confirm_password": "Passwords do not match."})
+
+        if verify_token_expiration(data['token']):
+            raise serializers.ValidationError({"token": "Token is expired."})
+        else:
+            user = models.TenantUser.objects.filter(
+                reset_token=data['token']).first()
+            if user == None:
+                raise serializers.ValidationError(
+                    {"token": "Token is expired."})
+            data['user'] = user
+        return data
+
+    def save(self):
+        user = self.validated_data['user']
+        password = self.validated_data['password']
+        user.set_password(password)
+        user.reset_token = None
+        user.save()
         return user
