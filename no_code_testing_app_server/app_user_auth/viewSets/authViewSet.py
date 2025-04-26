@@ -32,7 +32,7 @@ class AuthViewSet(GenericViewSet):
             user = authenticate(
                 username=request.data['username'], password=request.data['password'])
             if user is not None and user.is_active:
-                login(request, user)
+                # login(request, user)
                 token = Token.objects.get_or_create(user=user)
                 user_obj = formateUserObject(user)
                 user_obj.update({'token': token[0].key})
@@ -63,7 +63,7 @@ class AuthViewSet(GenericViewSet):
             user: models.TenantUser = user.save()
             user.set_password(request.data['password'])
             user.save(update_fields=['password'])
-            login(request, user)
+            # login(request, user)
             token = Token.objects.get_or_create(user=user)
             user_obj = formateUserObject(user)
             user_obj.update({'token': token[0].key})

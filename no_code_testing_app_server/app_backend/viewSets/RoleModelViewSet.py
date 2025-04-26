@@ -15,7 +15,7 @@ CONTENT_TYPE = 'application/json'
 class RoleModelViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.OrgRoleReadSerializer
-    queryset = models.OrgRole.objects.all()
+    queryset = models.OrgRole.objects.all().order_by('created_at')
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:

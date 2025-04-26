@@ -1,11 +1,14 @@
 from django.db import models
 from no_code_testing_app_server.utils.BaseModel import BaseModel
-from tenant_users.tenants.models import UserProfile, UserProfileManager
+from tenant_users.tenants.models import AbstractBaseUser, UserProfileManager, UserProfile
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+
 
 class UserManager(UserProfileManager):
     def create_superuser(self, username, email, password):
         user = self.create_user(
-            username=username, email=email, password=password)
+            username=username, email=email, password=password, is_staff=True)
         user.is_admin = True
         user.is_superuser = True
         user.email = email
@@ -14,12 +17,25 @@ class UserManager(UserProfileManager):
         user.save(using=self._db)
         return user
 
+    def delete_user(self, user_obj):
+        user_obj.delete()
 
-class TenantUser(UserProfile, BaseModel):
+
+class TenantUser(AbstractBaseUser, BaseModel):
     username = models.CharField(
         max_length=255, unique=True, blank=False, null=False)
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+
+    tenants = models.ManyToManyField(settings.TENANT_MODEL, verbose_name=_(
+        "tenants"), blank=True, help_text=_("The tenants this user belongs to."), related_name="user_set")
+
+    email = models.EmailField(
+        _("Email Address"),
+        unique=True,
+        db_index=True)
+
+    is_active = models.BooleanField(_("active"), default=True)
+
+    is_verified = models.BooleanField(_("verified"), default=False)
     is_superuser = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=True)

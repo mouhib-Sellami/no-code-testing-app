@@ -17,6 +17,7 @@ def has_permission(name: str):
                 permission = permissions.get(label=name.upper())
                 return f(*args, **kwargs)
             except ObjectDoesNotExist as e:
+                print(e)
                 return HttpResponse(json.dumps({"details": "unauthorized"}), status=status.HTTP_403_FORBIDDEN, content_type=CONTENT_TYPE)
         return decorator
     return inner_decorator

@@ -8,6 +8,7 @@ from app_tenant.viewSets import serializers as TenantSerializers
 from app_backend.viewSets import serializers as AppBackendSerializer
 from django.core.validators import RegexValidator
 from no_code_testing_app_server.utils import verify_token_expiration
+
 logger = logging.getLogger('no_code_testing_app')
 
 
@@ -191,7 +192,8 @@ class PasswordResetSerializer(serializers.Serializer):
     def save(self):
         user = self.validated_data['user']
         password = self.validated_data['password']
+        print(self.validated_data)
         user.set_password(password)
         user.reset_token = None
-        user.save()
+        user.save(update_fields=['password'])
         return user
