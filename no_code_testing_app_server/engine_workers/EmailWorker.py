@@ -1,4 +1,4 @@
-from app_user_auth import models
+from engine_app import models
 from engine.conf.Worker import Worker
 from engine.models import FailedTask, Task
 from app_user_auth.viewSets import serializers

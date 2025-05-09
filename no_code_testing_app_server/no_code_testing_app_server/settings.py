@@ -93,10 +93,11 @@ MIDDLEWARE = [
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'no_code_testing_app_server.middlewares.TenantAccessMiddleware.TenantAccessMiddleware',
-    'app_user_auth.middlewares.PermissionMiddleWare.PermissionMiddleWare',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'app_user_auth.middlewares.PermissionMiddleWare.PermissionMiddleWare',
+    'app_user_auth.middlewares.OrgMemberMiddleWare.OrgMemberMiddleWare',
 ]
 
 # SHOW_PUBLIC_IF_NO_TENANT_FOUND = True

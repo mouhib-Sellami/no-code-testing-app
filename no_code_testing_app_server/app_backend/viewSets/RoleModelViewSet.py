@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from rest_framework import status
 
-logger = logging.getLogger('sky_forge')
+logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
 

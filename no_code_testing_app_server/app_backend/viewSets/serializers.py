@@ -14,7 +14,31 @@ class BaseTenantUserSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'email',
+            'is_verified',
+            'is_active'
         )
+
+    def validate(self, attrs):
+        return attrs
+
+    def validate_username(self, value):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.username == value:
+            return value
+        if TenantUser.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                "A user with this username already exists.")
+        return value
+
+    def validate_email(self, value):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.email == value:
+            return value
+        if TenantUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                "A user with this email already exists.")
+        return value
+
 
 class ProjectSerializer(serializers.ModelSerializer):
 
@@ -94,12 +118,15 @@ class AppUserSerializer(serializers.ModelSerializer):
         return data
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUpdateUserSerializer(serializers.ModelSerializer):
     user = BaseTenantUserSerializer()
 
     class Meta:
         model = models.User
         fields = '__all__'
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
 
     def create(self, validated_data):
         try:
@@ -113,3 +140,18 @@ class CreateUserSerializer(serializers.ModelSerializer):
         except Exception as e:
             logger.exception(f"Error creating user: {str(e)}")
             raise serializers.ValidationError({"detail": str(e)})
+
+    def update(self, instance, validated_data):
+        try:
+            tenant_user_data = validated_data.pop('user', None)
+            if tenant_user_data:
+                tenant_user_serializer = BaseTenantUserSerializer(
+                    instance.user, data=tenant_user_data, partial=True
+                )
+                tenant_user_serializer.is_valid(raise_exception=True)
+                tenant_user_serializer.save()
+
+            return super().update(instance, validated_data)
+        except Exception as e:
+            logger.exception(f"Error updating user: {str(e)}")
+            raise e

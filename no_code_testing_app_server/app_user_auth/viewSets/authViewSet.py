@@ -4,10 +4,8 @@ from . import serializers
 from app_user_auth import models
 from rest_framework import status
 from django.http import HttpResponse
-from engine_app.views import mailing_engine
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
-from engine_app import models as appEngineModels
 from rest_framework.authtoken.models import Token
 from rest_framework.viewsets import GenericViewSet
 from django.contrib.auth import authenticate, login, logout
@@ -16,7 +14,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import IsAuthenticated
 from django_tenants.utils import schema_context, get_public_schema_name
 from no_code_testing_app_server.utils.userFormatter import formateUserObject
-from no_code_testing_app_server.utils import create_tiny_token, verify_token_expiration
+from no_code_testing_app_server.utils import verify_token_expiration
+from app_user_auth.utils.auth_utils import handle_reset_password_request
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
@@ -124,12 +123,7 @@ class AuthViewSet(GenericViewSet):
             email = serializer.validated_data['email']
             user = models.TenantUser.objects.get(
                 email=email)
-            user.reset_token = create_tiny_token()
-            user.save(update_fields=['reset_token'])
-            job = appEngineModels.MailJobs.objects.create(
-                receiver=user, type=appEngineModels.MailJobs.EmailTypes.RESET_PASSWORD)
-            mailing_engine.add_task(
-                job=job, delete_when_finish=False, new=True)
+            handle_reset_password_request(user)
         except ValidationError as v:
             logger.exception(str(v))
             return HttpResponse(json.dumps(v.__dict__), status=status.HTTP_422_UNPROCESSABLE_ENTITY, content_type=CONTENT_TYPE)
