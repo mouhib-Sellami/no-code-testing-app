@@ -42,20 +42,20 @@ sh:
 	@$(DJANGO_CONTAINER) sh
 
 make-migrations:
-	@$(DJANGO_PYTHON) manage.py makemigrations
+	@$(DJANGO_PYTHON) manage.py makemigrations --skip-check
 
 migrate:
-	@$(DJANGO_PYTHON) manage.py migrate
+	@$(DJANGO_PYTHON) manage.py migrate --skip-check
 
 migration:
-	@$(DJANGO_PYTHON) manage.py makemigrations
-	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared
-	@$(DJANGO_PYTHON) manage.py migrate
+	@$(DJANGO_PYTHON) manage.py makemigrations --skip-check
+	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared --skip-check
+	@$(DJANGO_PYTHON) manage.py migrate --skip-check
 
 deploy-server:
-	@$(DJANGO_PYTHON) manage.py makemigrations
-	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared
-	@$(DJANGO_PYTHON) manage.py collectstatic
+	@$(DJANGO_PYTHON) manage.py makemigrations --skip-check
+	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared --skip-check
+	@$(DJANGO_PYTHON) manage.py collectstatic --skip-check
 	@$(DJANGO_PYTHON) manage.py create_public_tenant --domain_url localhost --owner_email admin@domain.com
 	@$(DJANGO_PYTHON) manage.py create_tenant_superuser --username=root --schema=public
 

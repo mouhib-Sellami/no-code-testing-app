@@ -8,6 +8,7 @@ from app_tenant.viewSets import serializers as TenantSerializers
 from app_backend.viewSets import serializers as AppBackendSerializer
 from django.core.validators import RegexValidator
 from no_code_testing_app_server.utils import verify_token_expiration
+
 logger = logging.getLogger('no_code_testing_app')
 
 
@@ -23,6 +24,14 @@ class UserSerializer(serializers.ModelSerializer):
 
     role = serializers.SerializerMethodField("get_user_role")
     organization = serializers.SerializerMethodField("get_user_organization")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        extra_fields = self.context.get('extra_fields', [])
+        for field in extra_fields:
+            if field not in self.fields:
+                self.fields[field] = serializers.CharField(
+                    read_only=True, default='')
 
     class Meta:
         model = models.TenantUser
@@ -50,6 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class BaseUserSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField('get_tenant_user')
+    organization = serializers.SerializerMethodField("get_user_organization")
 
     class Meta:
         model = models.TenantUser
@@ -57,7 +67,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'email',
-            'user'
+            'user',
+            'organization'
         )
 
     def __init__(self, *args, **kwargs):
@@ -68,6 +79,11 @@ class BaseUserSerializer(serializers.ModelSerializer):
                 self.fields[field] = serializers.CharField(
                     read_only=True, default='')
 
+        exclude_fields = self.context.get('exclude_fields', [])
+        for field in exclude_fields:
+            if field in self.fields:
+                self.fields.pop(field)
+
     def get_tenant_user(self, obj):
         try:
             tenant = obj.tenants.all().first()
@@ -77,6 +93,13 @@ class BaseUserSerializer(serializers.ModelSerializer):
             logger.exception(str(e))
         return None
 
+    def get_user_organization(self, obj):
+        tenant = obj.tenants.all().first()
+        if tenant:
+            return TenantSerializers.TenantSerializer(tenant).data
+        else:
+            return None
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
@@ -85,7 +108,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         user_data.pop('user', {})
         id = user_data.pop('id', {})
         data.update(user_data)
-        data.update({'tenant_id': id})
+        data.update({'tenant_user_id': id})
         return data
 
 
@@ -191,7 +214,8 @@ class PasswordResetSerializer(serializers.Serializer):
     def save(self):
         user = self.validated_data['user']
         password = self.validated_data['password']
+        print(self.validated_data)
         user.set_password(password)
         user.reset_token = None
-        user.save()
+        user.save(update_fields=['password'])
         return user

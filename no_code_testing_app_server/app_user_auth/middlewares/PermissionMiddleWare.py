@@ -24,6 +24,7 @@ class PermissionMiddleWare:
                 else:
                     setattr(request, "permissions", [])
             except Exception as e:
+                print(e)
                 return HttpResponse(status=401, content_type=CONTENT_TYPE)
 
     def __call__(self, request):
