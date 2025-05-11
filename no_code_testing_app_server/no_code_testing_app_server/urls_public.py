@@ -9,5 +9,6 @@ urlpatterns = [
     path('api/', include('app_user_auth.urls')),
     path('api/', include('app_tenant.urls')),
     path('logs/', include('log_viewer.urls')),
+    path('api/', include('workflow_builder_config_app.urls')),
 ]+urls+static(settings.STATIC_URL,
               document_root=settings.STATIC_ROOT)

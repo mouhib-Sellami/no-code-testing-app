@@ -2,7 +2,7 @@ import logging
 from app_backend import models
 from rest_framework import serializers
 from app_user_auth.models import TenantUser
-from django.db import IntegrityError
+from workflow_builder_config_app.viewsets import serializers as WORKFLOW_CONFIG_SERIALIZERS
 
 logger = logging.getLogger('no_code_testing_app')
 
@@ -38,13 +38,6 @@ class BaseTenantUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "A user with this email already exists.")
         return value
-
-
-class ProjectSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Project
-        fields = '__all__'
 
 
 class AppPermissionSerializer(serializers.ModelSerializer):
@@ -155,3 +148,13 @@ class CreateUpdateUserSerializer(serializers.ModelSerializer):
         except Exception as e:
             logger.exception(f"Error updating user: {str(e)}")
             raise e
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    provider = WORKFLOW_CONFIG_SERIALIZERS.ProviderSerializer()
+    managed_by = AppUserSerializer()
+    members = AppUserSerializer(many=True)
+
+    class Meta:
+        model = models.Project
+        fields = '__all__'

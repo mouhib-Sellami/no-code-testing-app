@@ -58,7 +58,8 @@ SHARED_APPS = [
     'app_tenant',
     'app_user_auth',
     'engine',
-    'engine_app'
+    'engine_app',
+    "workflow_builder_config_app"
 ]
 
 TENANT_APPS = [
