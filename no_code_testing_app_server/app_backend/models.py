@@ -1,7 +1,6 @@
 from django.db import models
-from no_code_testing_app_server.utils.BaseModel import BaseModel
+from no_code_testing_app_server.shared import BaseModel
 from app_user_auth import models as authModels
-
 
 class AppPermission(BaseModel):
     label = models.CharField(max_length=255, null=False,

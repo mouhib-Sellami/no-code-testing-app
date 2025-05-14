@@ -1,9 +1,9 @@
 from engine_app import models
 from engine.conf.Worker import Worker
 from engine.models import FailedTask, Task
-from app_user_auth.viewSets import serializers
-from no_code_testing_app_server.config.mail_jet_config import MailJet
-from no_code_testing_app_server.config.mailing.mailing import generate_email
+from app_user_auth import serializers
+from no_code_testing_app_server.mailing_config.mail_jet_config import MailJet
+from no_code_testing_app_server.mailing import generate_email
 
 
 class EmailWorker(Worker):

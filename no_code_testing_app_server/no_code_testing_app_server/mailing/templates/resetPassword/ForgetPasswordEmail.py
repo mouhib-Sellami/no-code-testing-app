@@ -1,5 +1,5 @@
-from no_code_testing_app_server.config.mail_jet_config import Email
-from no_code_testing_app_server.config.mailing.templates.resetPassword import forgetPassword
+from no_code_testing_app_server.mailing_config.mail_jet_config import Email
+from no_code_testing_app_server.mailing.templates.resetPassword import forgetPassword
 
 
 class ForgetPasswordEmail(Email):

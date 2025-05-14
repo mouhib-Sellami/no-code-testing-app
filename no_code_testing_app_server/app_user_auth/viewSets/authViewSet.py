@@ -1,9 +1,9 @@
 import json
 import logging
-from . import serializers
 from app_user_auth import models
 from rest_framework import status
 from django.http import HttpResponse
+from app_user_auth import serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token

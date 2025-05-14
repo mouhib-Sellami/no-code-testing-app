@@ -1,31 +1,22 @@
 import json
 import logging
-from . import serializers
-from app_backend import models
+from rest_framework import status
 from django.http import HttpResponse
-from rest_framework import filters, status
+from app_backend import serializers, models
 from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
+from no_code_testing_app_server.shared import BaseModelViewSet
 from app_user_auth.auth_decorators.decorators import has_permission
-from app_backend.pagination_filters.app_pagination import defaultPagination
 from app_user_auth.utils.auth_utils import handle_reset_password_request, handle_new_user_creation
-
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
 
-class UserModelViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+class UserModelViewSet(BaseModelViewSet):
     serializer_class = serializers.AppUserSerializer
     queryset = models.User.objects.all()
-
-    pagination_class = defaultPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
 
     filterset_fields = ["user__is_active",]
     search_fields = ["$user__username",
@@ -100,3 +91,6 @@ class UserModelViewSet(ModelViewSet):
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+    # change password
+    # update self user

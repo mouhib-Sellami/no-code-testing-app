@@ -1,5 +1,5 @@
 import os
-from no_code_testing_app_server.config.mailing.templates.base_mail import base_mail_template
+from no_code_testing_app_server.mailing.templates.base_mail import base_mail_template
 
 APP_FRONT_URL = os.getenv('APP_FRONT_URL', 'http://localhost')
 APP_NAME = os.getenv('APP_NAME', 'Auto test builder')

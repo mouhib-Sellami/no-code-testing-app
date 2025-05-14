@@ -1,5 +1,5 @@
 from django.db import models
-from no_code_testing_app_server.utils.BaseModel import BaseModel
+from no_code_testing_app_server.shared import BaseModel
 from tenant_users.tenants.models import AbstractBaseUser, UserProfileManager, UserProfile
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _

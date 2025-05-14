@@ -2,7 +2,7 @@ import os
 from uuid import uuid4
 from django.db import models
 from django.conf import settings
-from no_code_testing_app_server.utils.BaseModel import BaseModel
+from no_code_testing_app_server.shared import BaseModel
 from no_code_testing_app_server.utils.modelValidate import validate_image_extension
 
 # add provider type for engine worker selection

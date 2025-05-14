@@ -1,8 +1,7 @@
 
 import logging
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from . import serializers
-from workflow_builder_config_app import models
+from workflow_builder_config_app import serializers, models
 from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger('no_code_testing_app')
@@ -19,9 +18,7 @@ class ProvidersReadOnlyViewSet(ReadOnlyModelViewSet):
         return serializers.BaseProviderSerializer
 
     def list(self, request, *args, **kwargs):
-        print(self.serializer_class)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
-        print(self.serializer_class)
         return super().retrieve(request, *args, **kwargs)

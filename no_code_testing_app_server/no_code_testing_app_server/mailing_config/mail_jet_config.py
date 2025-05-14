@@ -1,6 +1,6 @@
 import os
 from mailjet_rest import Client
-from no_code_testing_app_server.config.singleton_config.Singleton import singleton
+from no_code_testing_app_server.patterns import singleton
 from abc import ABC, abstractmethod
 
 
@@ -10,7 +10,7 @@ class Email(ABC):
         self.sender = os.getenv("MAIL_JET_FROM_EMAIL")
 
     @abstractmethod
-    def get_email(self,*arg,**kwargs):
+    def get_email(self, *arg, **kwargs):
         pass
 
 

@@ -1,24 +1,14 @@
 import logging
-from . import serializers
-from app_backend import models
-from rest_framework import filters
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
+from app_backend import serializers, models
 from app_user_auth.auth_decorators.decorators import has_permission
-from app_backend.pagination_filters.app_pagination import defaultPagination
+from no_code_testing_app_server.shared import BaseModelViewSet
 
 logger = logging.getLogger('no_code_testing_app')
-CONTENT_TYPE = 'application/json'
 
 
-class ProjectModelViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+class ProjectModelViewSet(BaseModelViewSet):
     serializer_class = serializers.ProjectSerializer
     queryset = models.Project.objects.all()
-
-    pagination_class = defaultPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
 
     search_fields = ["$name",
                      "$managed_by__user__username", '$provider__name']

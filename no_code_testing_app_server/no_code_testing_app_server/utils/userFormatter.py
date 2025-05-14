@@ -1,4 +1,4 @@
-from app_user_auth.viewSets import serializers as appBackendSerializer
+from app_user_auth import serializers as appBackendSerializer
 
 
 def formateUserObject(user):

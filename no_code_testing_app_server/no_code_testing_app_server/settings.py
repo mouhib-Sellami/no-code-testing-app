@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from no_code_testing_app_server.config.drf_config import *
-from no_code_testing_app_server.config.workers_config import *
+from no_code_testing_app_server.config import *
 from .logger import LOGGING
 
 

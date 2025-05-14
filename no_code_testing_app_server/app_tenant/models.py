@@ -3,7 +3,7 @@ from tenant_users.tenants.models import TenantBase
 from django.conf import settings
 import os
 from uuid import uuid4
-from no_code_testing_app_server.utils.BaseModel import BaseModel
+from no_code_testing_app_server.shared import BaseModel
 from no_code_testing_app_server.utils.modelValidate import validate_image_extension
 
 
