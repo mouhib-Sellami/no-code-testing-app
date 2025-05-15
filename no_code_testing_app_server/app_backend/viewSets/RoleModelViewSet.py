@@ -15,6 +15,8 @@ class RoleModelViewSet(BaseModelViewSet):
     serializer_class = serializers.OrgRoleReadSerializer
     queryset = models.OrgRole.objects.all().order_by('created_at')
 
+    search_fields = ["$name","$slug"]
+
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return serializers.OrgRoleReadSerializer

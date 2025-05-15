@@ -120,9 +120,15 @@ class CreateUpdateUserSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(DynamicModelSerializer):
-    provider = WORKFLOW_CONFIG_SERIALIZERS.ProviderSerializer()
+    provider = WORKFLOW_CONFIG_SERIALIZERS.BaseProviderSerializer()
     managed_by = AppUserSerializer()
     members = AppUserSerializer(many=True)
+
+    class Meta:
+        model = models.Project
+        fields = '__all__'
+        
+class CreateProjectSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.Project
