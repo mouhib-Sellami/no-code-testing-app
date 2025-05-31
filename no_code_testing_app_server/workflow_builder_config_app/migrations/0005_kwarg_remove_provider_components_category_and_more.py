@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('workflow_builder_config_app', '0004_alter_component_initial_config_and_more'),
+        ('workflow_builder_config_app',
+         '0004_alter_component_initial_config_and_more'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='Kwarg',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True, null=True)),
                 ('updated_at', models.DateTimeField(auto_now=True, null=True)),
                 ('label', models.CharField(max_length=255)),
@@ -30,11 +32,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True, null=True)),
                 ('updated_at', models.DateTimeField(auto_now=True, null=True)),
                 ('name', models.CharField(max_length=255)),
-                ('components', models.ManyToManyField(blank=True, null=True, related_name='component_providers', to='workflow_builder_config_app.component')),
+                ('components', models.ManyToManyField(
+                    blank=True, related_name='component_providers', to='workflow_builder_config_app.component')),
             ],
             options={
                 'ordering': ['created_at'],
@@ -44,11 +48,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='provider',
             name='categories',
-            field=models.ManyToManyField(null=True, related_name='category_providers', to='workflow_builder_config_app.category'),
+            field=models.ManyToManyField(
+                related_name='category_providers', to='workflow_builder_config_app.category'),
         ),
         migrations.AddField(
             model_name='component',
             name='arguments',
-            field=models.ManyToManyField(blank=True, null=True, to='workflow_builder_config_app.kwarg'),
+            field=models.ManyToManyField(
+                blank=True,  to='workflow_builder_config_app.kwarg'),
         ),
     ]

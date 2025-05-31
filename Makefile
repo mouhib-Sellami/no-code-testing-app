@@ -14,7 +14,7 @@ up:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up $(c)
 
 build:
-	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build $(c)
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache $(c)
 
 start:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d $(c)

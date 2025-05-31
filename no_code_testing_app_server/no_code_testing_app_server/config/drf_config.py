@@ -38,6 +38,8 @@ CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Headers',
     'ngrok-skip-browser-warning',
+    'AUTH_TOKEN',
+    'AGENT_KEY',
 ]
 
 CORS_ALLOW_METHODS = [

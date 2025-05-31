@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app_user_auth.urls')),
     path('api/', include('app_backend.urls')),
+    path('api/', include('runner_agent.urls')),
     path('api/', include('app_tenant.urls')),
     path('api/', include('workflow_builder_config_app.urls')),
-]  + static(settings.STATIC_URL,
-                  document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL,
+           document_root=settings.STATIC_ROOT)

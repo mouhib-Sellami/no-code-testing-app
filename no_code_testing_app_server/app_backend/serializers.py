@@ -1,3 +1,6 @@
+from runner_agent.models import RunnerAgent
+from collections import defaultdict
+from toposort import toposort_flatten
 import logging
 from app_backend import models
 from rest_framework import serializers
@@ -5,6 +8,8 @@ from workflow_builder_config_app import serializers as WORKFLOW_CONFIG_SERIALIZE
 from no_code_testing_app_server.shared import DynamicModelSerializer
 from app_user_auth.export_serializer import BaseTenantUserSerializer
 from app_user_auth.models import TenantUser
+from workflow_builder_config_app.models import Component
+from copy import deepcopy
 
 logger = logging.getLogger('no_code_testing_app')
 
@@ -127,9 +132,220 @@ class ProjectSerializer(DynamicModelSerializer):
     class Meta:
         model = models.Project
         fields = '__all__'
-        
+
+
 class CreateProjectSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.Project
         fields = '__all__'
+
+
+class KwargSerializer(DynamicModelSerializer):
+
+    class Meta:
+        model = models.Kwarg
+        fields = '__all__'
+        ref_name = "AppBackendKwargSerializer"
+
+
+class ProjectComponentSerializer(DynamicModelSerializer):
+    extra_arguments = KwargSerializer(many=True)
+    default_arguments = KwargSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.ProjectComponent
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        extra_arguments_data = validated_data.pop('extra_arguments', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if extra_arguments_data is not None:
+            current_kwarg_ids = set(
+                instance.extra_arguments.values_list('id', flat=True))
+            new_kwarg_ids = set(
+                item.get('id') for item in extra_arguments_data if item.get('id')
+            )
+
+            for kwarg_id in current_kwarg_ids - new_kwarg_ids:
+                instance.extra_arguments.remove(
+                    models.Kwarg.objects.get(id=kwarg_id))
+
+            for kwarg_data in extra_arguments_data:
+                kwarg_id = kwarg_data.get('id')
+                if kwarg_id:
+                    try:
+                        kwarg = models.Kwarg.objects.get(id=kwarg_id)
+                        KwargSerializer().update(kwarg, kwarg_data)
+                        instance.extra_arguments.add(kwarg)
+                    except models.Kwarg.DoesNotExist:
+                        raise serializers.ValidationError(
+                            f"Kwarg with id {kwarg_id} does not exist."
+                        )
+                else:
+                    kwarg = models.Kwarg.objects.create(**kwarg_data)
+                    instance.extra_arguments.add(kwarg)
+
+        return instance
+
+
+class CreateProjectComponentSerializer(serializers.Serializer):
+    project_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Project.objects.all(), source='project', write_only=True
+    )
+    component_id = serializers.PrimaryKeyRelatedField(
+        queryset=Component.objects.all(), source='component', write_only=True
+    )
+    extra_data = serializers.JSONField(
+        write_only=True
+    )
+    component = ProjectComponentSerializer(read_only=True)
+
+    class Meta:
+        fields = ('project_id', 'component_id', 'project', 'component')
+
+    def create(self, validated_data):
+        project = validated_data['project']
+        component = validated_data['component']
+
+        project_component = models.ProjectComponent(
+            name=component.name,
+            action_name=component.action_name,
+            module=component.module,
+            initial_config=deepcopy(
+                component.initial_config) if component.initial_config else None,
+            extra_download_assets=component.extra_download_assets,
+            is_function=component.is_function,
+            is_default=component.is_default,
+            type=component.type,
+            project=project,
+            builder_config=validated_data['extra_data']
+        )
+        project_component.save()
+
+        if component.extra_arguments.exists():
+            cloned_extra_kwargs = [
+                models.Kwarg(label=kwarg.label, value=kwarg.value)
+                for kwarg in component.extra_arguments.all()
+            ]
+            models.Kwarg.objects.bulk_create(cloned_extra_kwargs)
+            project_component.extra_arguments.set(cloned_extra_kwargs)
+
+        if component.default_arguments.exists():
+            cloned_default_kwargs = [
+                models.Kwarg(label=kwarg.label, value=kwarg.value)
+                for kwarg in component.default_arguments.all()
+            ]
+            models.Kwarg.objects.bulk_create(cloned_default_kwargs)
+            project_component.default_arguments.set(cloned_default_kwargs)
+
+        project_component.save()
+
+        return {
+            'component': project_component
+        }
+
+
+class ComponentDependencySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ComponentDependency
+        fields = '__all__'
+
+
+class EdgeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ComponentDependency
+        fields = '__all__'
+
+
+class ProjectComponentExecutionSerializer(serializers.Serializer):
+    project_id = serializers.IntegerField()
+    components = serializers.SerializerMethodField()
+    execution_order = serializers.SerializerMethodField()
+    dependencies = serializers.SerializerMethodField()
+
+    def get_components(self, obj):
+        project_id = obj['project_id']
+        components = models.ProjectComponent.objects.filter(
+            project_id=project_id)
+        return ProjectComponentSerializer(components, many=True).data
+
+    def get_dependencies(self, obj):
+        project_id = obj['project_id']
+        dependencies = models.ComponentDependency.objects.filter(
+            source_component__project_id=project_id
+        )
+        return ComponentDependencySerializer(dependencies, many=True).data
+
+    def get_execution_order(self, obj):
+        project_id = obj['project_id']
+        components = models.ProjectComponent.objects.filter(
+            project_id=project_id)
+        graph = defaultdict(set)
+        component_ids = set()
+        for component in components:
+            component_ids.add(component.id)
+            for dep in component.outgoing_dependencies.filter(dependency_type=models.DependencyType.RUN_AFTER):
+                if dep.target_component.project_id == project_id:
+                    graph[component.id].add(dep.target_component.id)
+
+        try:
+            ordered_ids = toposort_flatten(graph)
+            ordered_ids = [cid for cid in ordered_ids if cid in component_ids]
+            id_to_name = {c.id: c.name for c in components}
+            return [{'id': cid, 'name': id_to_name.get(cid, 'Unknown')} for cid in ordered_ids]
+        except ValueError:
+            raise serializers.ValidationError(
+                "Circular RUN_AFTER dependencies detected.")
+
+    def validate(self, data):
+        project_id = data['project_id']
+        if not models.ProjectComponent.objects.filter(project_id=project_id).exists():
+            raise serializers.ValidationError(
+                f"No components found for project_id {project_id}")
+        return data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        components = data['components']
+        execution_order = data['execution_order']
+        dependencies = data['dependencies']
+
+        component_dict = {comp['id']: comp for comp in components}
+
+        for comp in components:
+            comp['depends_on'] = [
+                dep['source_component_id']
+                for dep in dependencies
+                if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.DEPENDENCY.value
+            ]
+            comp['run_after'] = [
+                dep['source_component_id']
+                for dep in dependencies
+                if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.RUN_AFTER.value
+            ]
+
+        if any('target_component_id' not in dep for dep in dependencies):
+            print(
+                "Warning: Some dependencies missing 'target_component_id':", dependencies)
+        return {
+            'project_id': instance['project_id'],
+            'components': component_dict,
+            'execution_order': execution_order,
+            'dependencies': dependencies
+        }
+
+
+class ExecuteProjectSerializer(serializers.Serializer):
+    runner_id = serializers.PrimaryKeyRelatedField(
+        queryset=RunnerAgent.objects.all(), source='runneragent', write_only=True
+    )
+
+    class Meta:
+        fields = ('runner_id',)

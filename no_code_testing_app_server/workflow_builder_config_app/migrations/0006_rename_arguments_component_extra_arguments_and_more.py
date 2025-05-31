@@ -6,7 +6,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('workflow_builder_config_app', '0005_kwarg_remove_provider_components_category_and_more'),
+        ('workflow_builder_config_app',
+         '0005_kwarg_remove_provider_components_category_and_more'),
     ]
 
     operations = [
@@ -18,6 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='component',
             name='default_arguments',
-            field=models.ManyToManyField(null=True, to='workflow_builder_config_app.kwarg'),
+            field=models.ManyToManyField(
+                to='workflow_builder_config_app.kwarg'),
         ),
     ]

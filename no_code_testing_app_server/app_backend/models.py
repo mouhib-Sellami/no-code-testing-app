@@ -1,6 +1,8 @@
 from django.db import models
 from no_code_testing_app_server.shared import BaseModel
 from app_user_auth import models as authModels
+from workflow_builder_config_app.models import ComponentType
+from runner_agent import models as RUNNER_AGENT_MODELS
 
 
 class AppPermission(BaseModel):
@@ -59,7 +61,7 @@ class Project(BaseModel):
     name = models.CharField(max_length=255, blank=False, null=True)
     description = models.TextField(blank=False, null=True)
     members = models.ManyToManyField(
-        User, related_name="user_projects", null=True, blank=True)
+        User, related_name="user_projects", blank=True)
     provider = models.ForeignKey(
         'workflow_builder_config_app.Provider',
         related_name="provider_projects", on_delete=models.SET_NULL, null=True, blank=True)
@@ -72,6 +74,9 @@ class Project(BaseModel):
         blank=False,
         null=False
     )
+
+    selected_agent = models.ForeignKey(
+        RUNNER_AGENT_MODELS.RunnerAgent, on_delete=models.SET_NULL, null=True, blank=True, related_name="runner_projects")
 
     def __str__(self):
         return f"{self.name} ({self.status})"
@@ -104,3 +109,74 @@ class ProjectStatusLog(BaseModel):
 
     def __str__(self):
         return f"{self.project.name}"
+
+
+class Kwarg(BaseModel):
+    label = models.CharField(max_length=255, null=False, blank=False)
+    value = models.CharField(max_length=255, null=True, blank=True, default="")
+
+    def __str__(self):
+        return self.label if self.value is None else self.label + " - " + self.value
+
+
+class ProjectComponent(BaseModel):
+    name = models.CharField(max_length=255, null=False, blank=False)
+    action_name = models.CharField(max_length=255, null=False, blank=False)
+    module = models.CharField(max_length=255, null=True, blank=True)
+    initial_config = models.JSONField(null=True, blank=True)
+    extra_download_assets = models.TextField(blank=True, null=True)
+    is_function = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=False)
+    extra_arguments = models.ManyToManyField(
+        Kwarg, related_name="project_component_extra_arguments_kwargs",  blank=True)
+    default_arguments = models.ManyToManyField(
+        Kwarg, related_name="project_component_default_arguments_kwargs", blank=True)
+    type = models.CharField(
+        max_length=50,
+        choices=ComponentType.choices,
+        default=ComponentType.INPUT,
+        null=False,
+        blank=False
+    )
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, null=True, blank=True)
+    builder_config = models.JSONField(null=True, blank=True, default=None)
+
+    def __str__(self):
+        return self.name + " - " + self.action_name
+
+
+class DependencyType(models.TextChoices):
+    DEPENDENCY = "DEPENDENCY"
+    RUN_AFTER = "RUN_AFTER"
+
+
+class ComponentDependency(models.Model):
+    source_component = models.ForeignKey(
+        ProjectComponent,
+        on_delete=models.CASCADE,
+        related_name="outgoing_dependencies",
+    )
+    target_component = models.ForeignKey(
+        ProjectComponent,
+        on_delete=models.CASCADE,
+        related_name="incoming_dependencies",
+    )
+    dependency_type = models.CharField(
+        max_length=50,
+        choices=DependencyType.choices,
+        default=DependencyType.DEPENDENCY.value,
+    )
+    metadata = models.JSONField(
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        unique_together = ['source_component',
+                           'target_component', 'dependency_type']
+        verbose_name = "Component Dependency"
+        verbose_name_plural = "Component Dependencies"
+
+    def __str__(self):
+        return f"{self.source_component} -> {self.target_component} ({self.dependency_type})"

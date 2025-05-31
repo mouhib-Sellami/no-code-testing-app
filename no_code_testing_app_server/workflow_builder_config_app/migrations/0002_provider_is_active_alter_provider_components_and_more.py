@@ -18,11 +18,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='provider',
             name='components',
-            field=models.ManyToManyField(blank=True, null=True, related_name='component_providers', to='workflow_builder_config_app.component'),
+            field=models.ManyToManyField(
+                blank=True, related_name='component_providers', to='workflow_builder_config_app.component'),
         ),
         migrations.AlterField(
             model_name='provider',
             name='dependencies',
-            field=models.ManyToManyField(blank=True, null=True, related_name='dependency_providers', to='workflow_builder_config_app.dependency'),
+            field=models.ManyToManyField(
+                blank=True, related_name='dependency_providers', to='workflow_builder_config_app.dependency'),
         ),
     ]

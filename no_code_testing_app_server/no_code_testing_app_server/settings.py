@@ -66,6 +66,7 @@ TENANT_APPS = [
     'django.contrib.contenttypes',
     'tenant_users.permissions',
     'app_backend',
+    'runner_agent',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [
@@ -98,6 +99,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'app_user_auth.middlewares.PermissionMiddleWare.PermissionMiddleWare',
     'app_user_auth.middlewares.OrgMemberMiddleWare.OrgMemberMiddleWare',
+    'runner_agent.middlewares.RunnerAgentMiddleWare.RunnerAgentMiddleWare',
 ]
 
 # SHOW_PUBLIC_IF_NO_TENANT_FOUND = True

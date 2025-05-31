@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='component',
             name='default_arguments',
-            field=models.ManyToManyField(blank=True, null=True, related_name='default_arguments_kwargs', to='workflow_builder_config_app.kwarg'),
+            field=models.ManyToManyField(
+                blank=True, related_name='default_arguments_kwargs', to='workflow_builder_config_app.kwarg'),
         ),
     ]
