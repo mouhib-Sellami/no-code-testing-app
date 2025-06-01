@@ -134,6 +134,18 @@ class ProjectSerializer(DynamicModelSerializer):
         fields = '__all__'
 
 
+class ProjectStatusLogSerializer(DynamicModelSerializer):
+    workflow = serializers.JSONField(read_only=True)
+    agent_key = serializers.SerializerMethodField("get_agent")
+
+    class Meta:
+        model = models.ProjectStatusLog
+        fields = '__all__'
+
+    def get_agent(self, obj: models.ProjectStatusLog):
+        return str(obj.project.selected_agent.agent_key)
+
+
 class CreateProjectSerializer(DynamicModelSerializer):
 
     class Meta:

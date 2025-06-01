@@ -89,7 +89,10 @@ class ProjectModelViewSet(BaseModelViewSet):
                 'project': serializers.ProjectSerializer(project).data,
                 'workflow': project_workflow.data
             }))
-            return HttpResponse(json.dumps(serializers.ProjectSerializer(project).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+            project_status = models.ProjectStatusLog(project=project)
+            project_status.workflow = json.loads(json.dumps(project_workflow.data))
+            project_status.save()
+            return HttpResponse(json.dumps(serializers.ProjectStatusLogSerializer(project_status).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
