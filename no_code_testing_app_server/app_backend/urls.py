@@ -8,6 +8,7 @@ from app_backend.viewSets.RoleModelViewSet import RoleModelViewSet
 from app_backend.viewSets.UserModelViewSet import UserModelViewSet
 from app_backend.viewSets.ProjectComponentViewSet import ProjectComponentViewSet
 from app_backend.viewSets.EdgesViewSet import EdgesViewSet
+from app_backend.viewSets.ProjectLogViewSet import ProjectLogViewSet
 
 router = SimpleRouter()
 router.register(r"projects", ProjectModelViewSet, basename="projects")
@@ -18,6 +19,7 @@ router.register(r"edges", EdgesViewSet,
 router.register(r"permissions", PermissionViewSet, basename="permissions")
 router.register(r"roles", RoleModelViewSet, basename="roles")
 router.register(r"users", UserModelViewSet, basename="users")
+router.register(r"project-logs", ProjectLogViewSet, basename="project-logs")
 
 urlpatterns = [
     path("", include(router.urls)),

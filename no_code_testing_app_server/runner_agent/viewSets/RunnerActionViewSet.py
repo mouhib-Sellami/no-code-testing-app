@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet, mixins
 from rest_framework.decorators import action
 from rest_framework import status
 from django.http import HttpResponse
-
+from app_backend import models as BACK_MODELS
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
@@ -27,3 +27,29 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
         result = serializers.RunnerAgentSerializer(runner_agent).data
         result.update({'tenant_id': request.tenant.id})
         return HttpResponse(json.dumps(result), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+
+    @action(url_path="update-execution-status", url_name="update-execution-status", methods=['PUT'], detail=False)
+    def update_execution_status(self, request):
+        try:
+            execution = BACK_MODELS.ProjectStatusLog.objects.get(
+                id=request.data['execution_id'])
+            project = execution.project
+            execution.old_status = execution.new_status
+            execution.is_failed = BACK_MODELS.Status.CRASHLANDING.value == request.data[
+                'status']
+            execution.is_running = BACK_MODELS.Status.GALACTICCRUISE.value == request.data[
+                'status']
+            execution.is_finish = BACK_MODELS.Status.STELLARFINALE.value == request.data[
+                'status']
+            execution.new_status = request.data['status']
+            execution.save(update_fields=[
+                           'old_status', 'new_status', 'is_failed', 'is_running', 'is_finish'])
+            project.status = request.data['status']
+            project.save(update_fields=['status'])
+            if request.data.get("new_payload") != None:
+                execution.workflow = json.loads(request.data.get("new_payload"))
+                execution.save(update_fields=['workflow'])
+            return HttpResponse(json.dumps({'status': 'ok'}), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)

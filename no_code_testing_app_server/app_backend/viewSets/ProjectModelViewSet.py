@@ -85,13 +85,15 @@ class ProjectModelViewSet(BaseModelViewSet):
                 data=data)
             project_workflow.is_valid(raise_exception=True)
             print(f"{project.selected_agent.agent_key}_new_project")
+            project_status = models.ProjectStatusLog(project=project)
+            project_status.workflow = json.loads(
+                json.dumps(project_workflow.data))
+            project_status.save()
             broker.publish(f"{project.selected_agent.agent_key}_new_project", json.dumps({
                 'project': serializers.ProjectSerializer(project).data,
+                'execution': serializers.ProjectStatusLogSerializer(project_status).data,
                 'workflow': project_workflow.data
             }))
-            project_status = models.ProjectStatusLog(project=project)
-            project_status.workflow = json.loads(json.dumps(project_workflow.data))
-            project_status.save()
             return HttpResponse(json.dumps(serializers.ProjectStatusLogSerializer(project_status).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except Exception as e:
             logger.exception(str(e))

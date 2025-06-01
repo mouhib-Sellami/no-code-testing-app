@@ -173,8 +173,6 @@ class AuthViewSet(GenericViewSet):
 
     @action(detail=False, url_path='emqx', url_name='emqx', methods=['POST'], serializer_class=serializers.UserLoginSerializer)
     def emqx(self, request):
-        print("here")
-        print(request.data)
         if os.environ['EMQX_DEFAULT_USERNAME'] == request.data['username'] and os.environ['EMQX_DEFAULT_PASSWORD'] == request.data['password']:
             return HttpResponse(json.dumps({'result': "allow"}), status=200, content_type=CONTENT_TYPE)
         else:

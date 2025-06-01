@@ -107,6 +107,9 @@ class ProjectStatusLog(BaseModel):
         max_length=20, choices=Status.choices)
     failure_reason = models.TextField(null=True, blank=True)
     workflow = models.JSONField(null=True, blank=True)
+    is_running = models.BooleanField(default=False)
+    is_finish = models.BooleanField(default=False)
+    is_failed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.project.name}"

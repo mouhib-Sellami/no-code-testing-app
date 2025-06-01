@@ -137,6 +137,7 @@ class ProjectSerializer(DynamicModelSerializer):
 class ProjectStatusLogSerializer(DynamicModelSerializer):
     workflow = serializers.JSONField(read_only=True)
     agent_key = serializers.SerializerMethodField("get_agent")
+    project = ProjectSerializer()
 
     class Meta:
         model = models.ProjectStatusLog
