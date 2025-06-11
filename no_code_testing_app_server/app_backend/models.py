@@ -98,6 +98,47 @@ class Project(BaseModel):
         )
 
 
+class ProjectTestFlow(BaseModel):
+    name = models.CharField(max_length=255, null=False, blank=False)
+    project = models.ForeignKey(
+        Project, related_name="test_flows", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectTestCase(BaseModel):
+    """like provider component"""
+    name = models.CharField(max_length=255, null=False, blank=False)
+    project = models.ForeignKey(
+        Project, related_name="test_case_flows", on_delete=models.CASCADE)
+    is_reference = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+
+class TestFlowComponent(BaseModel):
+    """like project component"""
+    name = models.CharField(max_length=255, null=False, blank=False)
+    builder_config = models.JSONField(null=True, blank=True, default=None)
+    test_flow = models.ForeignKey(
+        ProjectTestFlow, related_name="test_flow_components", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectTestFlowAtomicCases(BaseModel):
+    name = models.CharField(max_length=255, null=False, blank=False)
+    project = models.ForeignKey(
+        Project, related_name="test_flows", on_delete=models.CASCADE)
+    test_cases = models.ManyToManyField(ProjectTestCase, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class ProjectStatusLog(BaseModel):
     project = models.ForeignKey(
         Project, related_name="status_logs", on_delete=models.CASCADE)
@@ -121,6 +162,77 @@ class Kwarg(BaseModel):
 
     def __str__(self):
         return self.label if self.value is None else self.label + " - " + self.value
+
+
+# class TestCaseType(models.TextChoices):
+#     TEST_CASE = "TEST_CASE"
+#     PRECONDITION = "PRECONDITION"
+
+
+# class TestCase(BaseModel):
+#     name = models.CharField(max_length=255, null=False, blank=False)
+#     project = models.ForeignKey(
+#         Project, on_delete=models.CASCADE, null=True, blank=True)
+#     re_init_provider = models.BooleanField(default=False)
+#     type = models.CharField(
+#         max_length=50, choices=TestCaseType.choices, default=TestCaseType.TEST_CASE.value)
+
+#     def __str__(self):
+#         return self.name + " - " + self.type
+
+
+# class testCaseDependencyType(models.TextChoices):
+#     PRECONDITION = "PRECONDITION"
+#     RUN_AFTER = "RUN_AFTER"
+
+
+# class ProjectWorkFlow(BaseModel):
+#     name = models.CharField(max_length=255, null=False, blank=False)
+#     project = models.ForeignKey(
+#         Project, on_delete=models.CASCADE, null=True, blank=True)
+#     builder_config = models.JSONField(null=True, blank=True, default=None)
+#     re_init_provider = models.BooleanField(default=False)
+#     type = models.CharField(
+#         max_length=50, choices=TestCaseType.choices, default=TestCaseType.TEST_CASE.value)
+
+#     def __str__(self):
+#         return self.name + " - " + self.type
+
+
+# class WorkFlowTest(BaseModel):
+#     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
+#     builder_config = models.JSONField(null=True, blank=True, default=None)
+
+
+# class TestCaseDependency(models.Model):
+#     source_test = models.ForeignKey(
+#         WorkFlowTest,
+#         on_delete=models.CASCADE,
+#         related_name="outgoing_dependencies",
+#     )
+#     target_test = models.ForeignKey(
+#         WorkFlowTest,
+#         on_delete=models.CASCADE,
+#         related_name="incoming_dependencies",
+#     )
+#     dependency_type = models.CharField(
+#         max_length=50,
+#         choices=testCaseDependencyType.choices,
+#         default=testCaseDependencyType.RUN_AFTER.value,
+#     )
+#     metadata = models.JSONField(
+#         null=True,
+#         blank=True,
+#     )
+
+#     class Meta:
+#         unique_together = ['source_test',
+#                            'target_test', 'dependency_type']
+#         verbose_name = "Test Dependency"
+#         verbose_name_plural = "Tests Dependencies"
+
+#     def __str__(self):
+#         return f"{self.source_test} -> {self.target_test} ({self.dependency_type})"
 
 
 class ProjectComponent(BaseModel):

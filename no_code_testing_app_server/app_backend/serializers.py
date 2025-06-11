@@ -153,6 +153,26 @@ class CreateProjectSerializer(DynamicModelSerializer):
         model = models.Project
         fields = '__all__'
 
+    def create(self, validated_data):
+        project = super().create(validated_data)
+        workflow = models.ProjectTestFlow(project=project, name="Test flow 1")
+        workflow.save()
+        return project
+
+
+class ProjectTestFlowSerializer(DynamicModelSerializer):
+
+    class Meta:
+        model = models.ProjectTestFlow
+        fields = '__all__'
+
+
+class ProjectTestCaseSerializer(DynamicModelSerializer):
+
+    class Meta:
+        model = models.ProjectTestCase
+        fields = '__all__'
+
 
 class KwargSerializer(DynamicModelSerializer):
 

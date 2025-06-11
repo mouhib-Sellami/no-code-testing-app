@@ -62,9 +62,36 @@ class ProjectModelViewSet(BaseModelViewSet):
     @action(methods=['GET'], url_path="components", url_name="components", detail=True, serializer_class=serializers.ProjectComponentSerializer)
     def components(self, request, pk=None, *args, **kwargs):
         try:
+            # to be change
             components = models.ProjectComponent.objects.filter(
                 project__id=pk).all()
             return HttpResponse(json.dumps(serializers.ProjectComponentSerializer(components, many=True).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        except ObjectDoesNotExist as e:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND, content_type=CONTENT_TYPE)
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+    @has_permission("can_change_project")
+    @action(methods=['GET'], url_path="test-cases", url_name="test-cases", detail=True, serializer_class=serializers.ProjectTestCaseSerializer)
+    def test_cases(self, request, pk=None, *args, **kwargs):
+        try:
+            tests = models.ProjectTestCase.objects.filter(
+                project__id=pk).all()
+            return HttpResponse(json.dumps(serializers.ProjectTestCaseSerializer(tests, many=True).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        except ObjectDoesNotExist as e:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND, content_type=CONTENT_TYPE)
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+    @has_permission("can_change_project")
+    @action(methods=['GET'], url_path="test-flows", url_name="test-flows", detail=True, serializer_class=serializers.ProjectTestFlowSerializer)
+    def test_flows(self, request, pk=None, *args, **kwargs):
+        try:
+            tests = models.ProjectTestFlow.objects.filter(
+                project__id=pk).all()
+            return HttpResponse(json.dumps(serializers.ProjectTestFlowSerializer(tests, many=True).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except ObjectDoesNotExist as e:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND, content_type=CONTENT_TYPE)
         except Exception as e:
