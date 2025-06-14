@@ -62,7 +62,6 @@ class ProjectModelViewSet(BaseModelViewSet):
     @action(methods=['GET'], url_path="components", url_name="components", detail=True, serializer_class=serializers.ProjectComponentSerializer)
     def components(self, request, pk=None, *args, **kwargs):
         try:
-            # to be change
             components = models.ProjectComponent.objects.filter(
                 project__id=pk).all()
             return HttpResponse(json.dumps(serializers.ProjectComponentSerializer(components, many=True).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)

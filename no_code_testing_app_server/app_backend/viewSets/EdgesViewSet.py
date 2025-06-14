@@ -23,8 +23,8 @@ class EdgesViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModel
     def retrieve(self, request, pk=None, *args, **kwargs):
         try:
             edges = models.ComponentDependency.objects.filter(
-                Q(source_component__project__id=pk) |
-                Q(target_component__project__id=pk)
+                Q(source_component__project_test_case__id=pk) |
+                Q(target_component__project_test_case__id=pk)
             )
             return HttpResponse(json.dumps(serializers.EdgeSerializer(edges, many=True).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except Exception as e:

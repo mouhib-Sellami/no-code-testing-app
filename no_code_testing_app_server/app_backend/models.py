@@ -256,10 +256,12 @@ class ProjectComponent(BaseModel):
     )
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, null=True, blank=True)
+    project_test_case = models.ForeignKey(
+        ProjectTestCase, on_delete=models.CASCADE, null=True, blank=True)
     builder_config = models.JSONField(null=True, blank=True, default=None)
 
     def __str__(self):
-        return self.name + " - " + self.action_name
+        return self.name + " - " + self.action_name + " - "+self.project_test_case.name
 
 
 class DependencyType(models.TextChoices):

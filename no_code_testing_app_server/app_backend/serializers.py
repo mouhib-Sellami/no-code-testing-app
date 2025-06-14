@@ -174,6 +174,13 @@ class ProjectTestCaseSerializer(DynamicModelSerializer):
         fields = '__all__'
 
 
+class ProjectTestCaseSerializer(DynamicModelSerializer):
+
+    class Meta:
+        model = models.ProjectTestCase
+        fields = '__all__'
+
+
 class KwargSerializer(DynamicModelSerializer):
 
     class Meta:
@@ -233,6 +240,9 @@ class CreateProjectComponentSerializer(serializers.Serializer):
     component_id = serializers.PrimaryKeyRelatedField(
         queryset=Component.objects.all(), source='component', write_only=True
     )
+    test_case_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.ProjectTestCase.objects.all(), source='projecttestcase', write_only=True
+    )
     extra_data = serializers.JSONField(
         write_only=True
     )
@@ -244,6 +254,7 @@ class CreateProjectComponentSerializer(serializers.Serializer):
     def create(self, validated_data):
         project = validated_data['project']
         component = validated_data['component']
+        test_case = validated_data['projecttestcase']
 
         project_component = models.ProjectComponent(
             name=component.name,
@@ -256,6 +267,7 @@ class CreateProjectComponentSerializer(serializers.Serializer):
             is_default=component.is_default,
             type=component.type,
             project=project,
+            project_test_case=test_case,
             builder_config=validated_data['extra_data']
         )
         project_component.save()
