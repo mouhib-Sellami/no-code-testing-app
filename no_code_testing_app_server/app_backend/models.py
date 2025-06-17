@@ -3,6 +3,7 @@ from no_code_testing_app_server.shared import BaseModel
 from app_user_auth import models as authModels
 from workflow_builder_config_app.models import ComponentType
 from runner_agent import models as RUNNER_AGENT_MODELS
+from django.db import transaction
 
 
 class AppPermission(BaseModel):
@@ -112,21 +113,126 @@ class ProjectTestCase(BaseModel):
     name = models.CharField(max_length=255, null=False, blank=False)
     project = models.ForeignKey(
         Project, related_name="test_case_flows", on_delete=models.CASCADE)
-    is_reference = models.BooleanField(default=False)
+    is_reference = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
 
 
-class TestFlowComponent(BaseModel):
+class TestFlowComponent(ProjectTestCase):
     """like project component"""
-    name = models.CharField(max_length=255, null=False, blank=False)
     builder_config = models.JSONField(null=True, blank=True, default=None)
     test_flow = models.ForeignKey(
-        ProjectTestFlow, related_name="test_flow_components", on_delete=models.CASCADE)
+        ProjectTestFlow, related_name="test_flow_components", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def clone_from_test_case(cls, test_case, test_flow, extra_data=None):
+        print("here")
+        with transaction.atomic():
+
+            flow_test_case = cls(
+                name=test_case.name,
+                builder_config=extra_data,
+                test_flow=test_flow,
+                is_reference=False,  # to change false
+                project=test_case.project
+            )
+            print("here")
+            flow_test_case.save()
+            print(flow_test_case)
+            project_components = ProjectComponent.objects.filter(
+                project_test_case=test_case)
+
+            component_mapping = {}
+            print(project_components)
+            for project_component in project_components:
+                new_component = ProjectComponent(
+                    name=project_component.name,
+                    action_name=project_component.action_name,
+                    module=project_component.module,
+                    initial_config=project_component.initial_config,
+                    extra_download_assets=project_component.extra_download_assets,
+                    is_function=project_component.is_function,
+                    is_default=project_component.is_default,
+                    type=project_component.type,
+                    project=project_component.project,
+                    project_test_case=flow_test_case,
+                    builder_config=project_component.builder_config,
+                )
+                print(new_component)
+                new_component.save()
+                try:
+                    new_extra_args = []
+                    for kwarg in project_component.extra_arguments.all():
+                        new_kwarg = Kwarg(
+                            label=kwarg.label,
+                            value=kwarg.value,
+                        )
+                        new_kwarg.save()
+                        new_extra_args.append(new_kwarg)
+                    if new_extra_args:
+                        new_component.extra_arguments.set(new_extra_args)
+                except Exception as e:
+                    raise ValueError(
+                        f"Failed to clone extra_arguments for component {project_component.name}: {str(e)}")
+                try:
+                    new_default_args = []
+                    for kwarg in project_component.default_arguments.all():
+                        new_kwarg = Kwarg(
+                            label=kwarg.label,
+                            value=kwarg.value,
+                        )
+                        new_kwarg.save()
+                        new_default_args.append(new_kwarg)
+                    if new_default_args:
+                        new_component.default_arguments.set(new_default_args)
+                except Exception as e:
+                    raise ValueError(
+                        f"Failed to clone extra_arguments for component {project_component.name}: {str(e)}")
+                # new_component.default_arguments.set(
+                #     project_component.default_arguments.all())
+
+                component_mapping[project_component.id] = new_component
+
+            dependencies = ComponentDependency.objects.filter(
+                source_component__in=project_components,
+                target_component__in=project_components
+            )
+            for dependency in dependencies:
+                new_dependency = ComponentDependency(
+                    source_component=component_mapping[dependency.source_component.id],
+                    target_component=component_mapping[dependency.target_component.id],
+                    dependency_type=dependency.dependency_type,
+                    metadata=dependency.metadata
+                )
+                new_dependency.save()
+
+            return flow_test_case
+
+
+class TestFlowDependency(models.Model):
+    source_component = models.ForeignKey(
+        TestFlowComponent,
+        on_delete=models.CASCADE,
+        related_name="outgoing_test_flow_dependencies",
+    )
+    target_component = models.ForeignKey(
+        TestFlowComponent,
+        on_delete=models.CASCADE,
+        related_name="incoming_test_flow_dependencies",
+    )
+
+    class Meta:
+        unique_together = ['source_component',
+                           'target_component']
+        verbose_name = "TestFlows Dependency"
+        verbose_name_plural = "TestFlows Dependencies"
+
+    def __str__(self):
+        return f"{self.source_component} -> {self.target_component}"
 
 
 class ProjectTestFlowAtomicCases(BaseModel):
@@ -162,77 +268,6 @@ class Kwarg(BaseModel):
 
     def __str__(self):
         return self.label if self.value is None else self.label + " - " + self.value
-
-
-# class TestCaseType(models.TextChoices):
-#     TEST_CASE = "TEST_CASE"
-#     PRECONDITION = "PRECONDITION"
-
-
-# class TestCase(BaseModel):
-#     name = models.CharField(max_length=255, null=False, blank=False)
-#     project = models.ForeignKey(
-#         Project, on_delete=models.CASCADE, null=True, blank=True)
-#     re_init_provider = models.BooleanField(default=False)
-#     type = models.CharField(
-#         max_length=50, choices=TestCaseType.choices, default=TestCaseType.TEST_CASE.value)
-
-#     def __str__(self):
-#         return self.name + " - " + self.type
-
-
-# class testCaseDependencyType(models.TextChoices):
-#     PRECONDITION = "PRECONDITION"
-#     RUN_AFTER = "RUN_AFTER"
-
-
-# class ProjectWorkFlow(BaseModel):
-#     name = models.CharField(max_length=255, null=False, blank=False)
-#     project = models.ForeignKey(
-#         Project, on_delete=models.CASCADE, null=True, blank=True)
-#     builder_config = models.JSONField(null=True, blank=True, default=None)
-#     re_init_provider = models.BooleanField(default=False)
-#     type = models.CharField(
-#         max_length=50, choices=TestCaseType.choices, default=TestCaseType.TEST_CASE.value)
-
-#     def __str__(self):
-#         return self.name + " - " + self.type
-
-
-# class WorkFlowTest(BaseModel):
-#     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
-#     builder_config = models.JSONField(null=True, blank=True, default=None)
-
-
-# class TestCaseDependency(models.Model):
-#     source_test = models.ForeignKey(
-#         WorkFlowTest,
-#         on_delete=models.CASCADE,
-#         related_name="outgoing_dependencies",
-#     )
-#     target_test = models.ForeignKey(
-#         WorkFlowTest,
-#         on_delete=models.CASCADE,
-#         related_name="incoming_dependencies",
-#     )
-#     dependency_type = models.CharField(
-#         max_length=50,
-#         choices=testCaseDependencyType.choices,
-#         default=testCaseDependencyType.RUN_AFTER.value,
-#     )
-#     metadata = models.JSONField(
-#         null=True,
-#         blank=True,
-#     )
-
-#     class Meta:
-#         unique_together = ['source_test',
-#                            'target_test', 'dependency_type']
-#         verbose_name = "Test Dependency"
-#         verbose_name_plural = "Tests Dependencies"
-
-#     def __str__(self):
-#         return f"{self.source_test} -> {self.target_test} ({self.dependency_type})"
 
 
 class ProjectComponent(BaseModel):

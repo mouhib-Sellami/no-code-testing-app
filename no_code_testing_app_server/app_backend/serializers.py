@@ -174,6 +174,42 @@ class ProjectTestCaseSerializer(DynamicModelSerializer):
         fields = '__all__'
 
 
+class TestFlowComponentSerializer(DynamicModelSerializer):
+
+    class Meta:
+        model = models.TestFlowComponent
+        fields = '__all__'
+
+
+class CreateTestFlowComponentSerializer(serializers.Serializer):
+    flow_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.ProjectTestFlow.objects.all(), source='flow', write_only=True
+    )
+    test_case_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.ProjectTestCase.objects.all(), source='testcase', write_only=True
+    )
+    extra_data = serializers.JSONField(
+        write_only=True
+    )
+    component = TestFlowComponentSerializer(read_only=True)
+
+    class Meta:
+        fields = ('flow_id', 'test_case_id', 'component')
+
+    def create(self, validated_data):
+        flow = validated_data['flow']
+        test_case = validated_data['testcase']
+        print("*"*10)
+        new_flow_component = models.TestFlowComponent.clone_from_test_case(
+            test_case=test_case,
+            test_flow=flow,
+            extra_data=validated_data['extra_data']
+        )
+        return {
+            'component': new_flow_component
+        }
+
+
 class ProjectTestCaseSerializer(DynamicModelSerializer):
 
     class Meta:
@@ -309,35 +345,120 @@ class EdgeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProjectComponentExecutionSerializer(serializers.Serializer):
-    project_id = serializers.IntegerField()
+class TestFlowEdgeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.TestFlowDependency
+        fields = '__all__'
+
+
+# class ProjectComponentExecutionSerializer(serializers.Serializer):
+#     project_id = serializers.IntegerField()
+#     components = serializers.SerializerMethodField()
+#     execution_order = serializers.SerializerMethodField()
+#     dependencies = serializers.SerializerMethodField()
+
+#     def get_components(self, obj):
+#         project_id = obj['project_id']
+#         components = models.ProjectComponent.objects.filter(
+#             project_id=project_id)
+#         return ProjectComponentSerializer(components, many=True).data
+
+#     def get_dependencies(self, obj):
+#         project_id = obj['project_id']
+#         dependencies = models.ComponentDependency.objects.filter(
+#             source_component__project_id=project_id
+#         )
+#         return ComponentDependencySerializer(dependencies, many=True).data
+
+#     def get_execution_order(self, obj):
+#         project_id = obj['project_id']
+#         components = models.ProjectComponent.objects.filter(
+#             project_id=project_id)
+#         graph = defaultdict(set)
+#         component_ids = set()
+#         for component in components:
+#             component_ids.add(component.id)
+#             for dep in component.outgoing_dependencies.filter(dependency_type=models.DependencyType.RUN_AFTER):
+#                 if dep.target_component.project_id == project_id:
+#                     graph[component.id].add(dep.target_component.id)
+
+#         try:
+#             ordered_ids = toposort_flatten(graph)
+#             ordered_ids = [cid for cid in ordered_ids if cid in component_ids]
+#             id_to_name = {c.id: c.name for c in components}
+#             return [{'id': cid, 'name': id_to_name.get(cid, 'Unknown')} for cid in ordered_ids]
+#         except ValueError:
+#             raise serializers.ValidationError(
+#                 "Circular RUN_AFTER dependencies detected.")
+
+#     def validate(self, data):
+#         project_id = data['project_id']
+#         if not models.ProjectComponent.objects.filter(project_id=project_id).exists():
+#             raise serializers.ValidationError(
+#                 f"No components found for project_id {project_id}")
+#         return data
+
+#     def to_representation(self, instance):
+#         data = super().to_representation(instance)
+#         components = data['components']
+#         execution_order = data['execution_order']
+#         dependencies = data['dependencies']
+
+#         component_dict = {comp['id']: comp for comp in components}
+
+#         for comp in components:
+#             comp['depends_on'] = [
+#                 dep['source_component_id']
+#                 for dep in dependencies
+#                 if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.DEPENDENCY.value
+#             ]
+#             comp['run_after'] = [
+#                 dep['source_component_id']
+#                 for dep in dependencies
+#                 if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.RUN_AFTER.value
+#             ]
+
+#         if any('target_component_id' not in dep for dep in dependencies):
+#             print(
+#                 "Warning: Some dependencies missing 'target_component_id':", dependencies)
+#         return {
+#             'project_id': instance['project_id'],
+#             'components': component_dict,
+#             'execution_order': execution_order,
+#             'dependencies': dependencies
+#         }
+
+
+class TestCaseExecutionSerializer(serializers.Serializer):
+    test_case_id = serializers.IntegerField()
     components = serializers.SerializerMethodField()
     execution_order = serializers.SerializerMethodField()
     dependencies = serializers.SerializerMethodField()
 
     def get_components(self, obj):
-        project_id = obj['project_id']
+        test_case_id = obj['test_case_id']
         components = models.ProjectComponent.objects.filter(
-            project_id=project_id)
+            project_test_case_id=test_case_id)
         return ProjectComponentSerializer(components, many=True).data
 
     def get_dependencies(self, obj):
-        project_id = obj['project_id']
+        test_case_id = obj['test_case_id']
         dependencies = models.ComponentDependency.objects.filter(
-            source_component__project_id=project_id
+            source_component__project_test_case__id=test_case_id
         )
         return ComponentDependencySerializer(dependencies, many=True).data
 
     def get_execution_order(self, obj):
-        project_id = obj['project_id']
+        test_case_id = obj['test_case_id']
         components = models.ProjectComponent.objects.filter(
-            project_id=project_id)
+            project_test_case_id=test_case_id)
         graph = defaultdict(set)
         component_ids = set()
         for component in components:
             component_ids.add(component.id)
             for dep in component.outgoing_dependencies.filter(dependency_type=models.DependencyType.RUN_AFTER):
-                if dep.target_component.project_id == project_id:
+                if dep.target_component.project_test_case_id == test_case_id:
                     graph[component.id].add(dep.target_component.id)
 
         try:
@@ -350,10 +471,10 @@ class ProjectComponentExecutionSerializer(serializers.Serializer):
                 "Circular RUN_AFTER dependencies detected.")
 
     def validate(self, data):
-        project_id = data['project_id']
-        if not models.ProjectComponent.objects.filter(project_id=project_id).exists():
+        test_case_id = data['test_case_id']
+        if not models.ProjectComponent.objects.filter(project_test_case_id=test_case_id).exists():
             raise serializers.ValidationError(
-                f"No components found for project_id {project_id}")
+                f"No components found for test_case_id {test_case_id}")
         return data
 
     def to_representation(self, instance):
@@ -361,9 +482,7 @@ class ProjectComponentExecutionSerializer(serializers.Serializer):
         components = data['components']
         execution_order = data['execution_order']
         dependencies = data['dependencies']
-
         component_dict = {comp['id']: comp for comp in components}
-
         for comp in components:
             comp['depends_on'] = [
                 dep['source_component_id']
@@ -377,10 +496,11 @@ class ProjectComponentExecutionSerializer(serializers.Serializer):
             ]
 
         if any('target_component_id' not in dep for dep in dependencies):
-            print(
-                "Warning: Some dependencies missing 'target_component_id':", dependencies)
+            logger.warning(
+                "Some dependencies missing 'target_component_id': %s", dependencies)
+
         return {
-            'project_id': instance['project_id'],
+            'test_case_id': instance['test_case_id'],
             'components': component_dict,
             'execution_order': execution_order,
             'dependencies': dependencies
@@ -394,3 +514,141 @@ class ExecuteProjectSerializer(serializers.Serializer):
 
     class Meta:
         fields = ('runner_id',)
+
+# class ProjectTestFlowExecutionSerializer(serializers.Serializer):
+#     test_flow_id = serializers.IntegerField()
+#     project_id = serializers.SerializerMethodField()
+#     components = serializers.SerializerMethodField()
+#     execution_order = serializers.SerializerMethodField()
+#     dependencies = serializers.SerializerMethodField()
+
+#     def get_project_id(self, obj):
+#         test_flow = models.ProjectTestFlow.objects.get(id=obj['test_flow_id'])
+#         return test_flow.project.id
+
+#     def get_components(self, obj):
+#         test_flow_id = obj['test_flow_id']
+#         test_flow_components = models.TestFlowComponent.objects.filter(
+#             test_flow_id=test_flow_id)
+#         project_components = models.ProjectComponent.objects.filter(
+#             project_test_case__in=test_flow_components)
+#         return ProjectComponentSerializer(project_components, many=True).data
+
+#     def get_dependencies(self, obj):
+#         test_flow_id = obj['test_flow_id']
+#         test_flow_components = models.TestFlowComponent.objects.filter(
+#             test_flow_id=test_flow_id)
+#         project_components = models.ProjectComponent.objects.filter(
+#             project_test_case__in=test_flow_components)
+
+#         component_dependencies = models.ComponentDependency.objects.filter(
+#             source_component__in=project_components,
+#             target_component__in=project_components
+#         )
+#         component_dep_data = ComponentDependencySerializer(
+#             component_dependencies, many=True).data
+
+#         test_flow_dependencies = models.TestFlowDependency.objects.filter(
+#             source_component__in=test_flow_components,
+#             target_component__in=test_flow_components
+#         )
+#         component_id_map = {
+#             tfc.id: tfc.project_test_case.id for tfc in test_flow_components if tfc.project_test_case}
+
+#         test_flow_dep_data = []
+#         for dep in test_flow_dependencies:
+#             source_component_id = component_id_map.get(dep.source_component_id)
+#             target_component_id = component_id_map.get(dep.target_component_id)
+#             if source_component_id and target_component_id:
+#                 test_flow_dep_data.append({
+#                     'source_component_id': source_component_id,
+#                     'target_component_id': target_component_id,
+#                     'dependency_type': models.DependencyType.DEPENDENCY.value
+#                     'metadata': None
+#                 })
+
+#         return component_dep_data + test_flow_dep_data
+
+#     def get_execution_order(self, obj):
+#         test_flow_id = obj['test_flow_id']
+#         test_flow_components = models.TestFlowComponent.objects.filter(
+#             test_flow_id=test_flow_id)
+#         project_components = models.ProjectComponent.objects.filter(
+#             project_test_case__in=test_flow_components)
+
+#         graph = defaultdict(set)
+#         component_ids = set()
+#         component_id_map = {
+#             tfc.id: tfc.project_test_case.id for tfc in test_flow_components if tfc.project_test_case}
+
+#         for component in project_components:
+#             component_ids.add(component.id)
+#             for dep in component.outgoing_dependencies.filter(
+#                 dependency_type=models.DependencyType.RUN_AFTER,
+#                 target_component__in=project_components
+#             ):
+#                 graph[component.id].add(dep.target_component.id)
+
+#         test_flow_dependencies = models.TestFlowDependency.objects.filter(
+#             source_component__in=test_flow_components,
+#             target_component__in=test_flow_components
+#         )
+#         for dep in test_flow_dependencies:
+#             source_id = component_id_map.get(dep.source_component_id)
+#             target_id = component_id_map.get(dep.target_component_id)
+#             if source_id and target_id:
+#                 graph[source_id].add(target_id)
+
+#         try:
+#             ordered_ids = toposort_flatten(graph)
+#             ordered_ids = [cid for cid in ordered_ids if cid in component_ids]
+#             id_to_name = {c.id: c.name for c in project_components}
+#             return [{'id': cid, 'name': id_to_name.get(cid, 'Unknown')} for cid in ordered_ids]
+#         except ValueError:
+#             raise serializers.ValidationError(
+#                 f"Circular RUN_AFTER dependencies detected in test flow {test_flow_id}."
+#             )
+
+#     def validate(self, data):
+#         test_flow_id = data['test_flow_id']
+#         if not models.ProjectTestFlow.objects.filter(id=test_flow_id).exists():
+#             raise serializers.ValidationError(
+#                 f"No test flow found for test_flow_id {test_flow_id}"
+#             )
+#         if not models.TestFlowComponent.objects.filter(test_flow_id=test_flow_id).exists():
+#             raise serializers.ValidationError(
+#                 f"No components found for test_flow_id {test_flow_id}"
+#             )
+#         return data
+
+#     def to_representation(self, instance):
+#         data = super().to_representation(instance)
+#         components = data['components']
+#         execution_order = data['execution_order']
+#         dependencies = data['dependencies']
+
+#         component_dict = {comp['id']: comp for comp in components}
+
+#         for comp in components:
+#             comp['depends_on'] = [
+#                 dep['source_component_id']
+#                 for dep in dependencies
+#                 if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.DEPENDENCY.value
+#             ]
+#             comp['run_after'] = [
+#                 dep['source_component_id']
+#                 for dep in dependencies
+#                 if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.RUN_AFTER.value
+#             ]
+
+#         if any('target_component_id' not in dep for dep in dependencies):
+#             print(
+#                 "Warning: Some dependencies missing 'target_component_id':", dependencies)
+
+#         return {
+#             'project_id': data['project_id'],
+#             'test_flow_id': instance['test_flow_id'],
+#             'components': component_dict,
+#             'execution_order': execution_order,
+#             'dependencies': dependencies
+#         }
