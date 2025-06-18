@@ -45,23 +45,21 @@ class ProjectTestViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
             print(f"{project.selected_agent.agent_key}_new_project_test_case")
             project_status = models.ProjectStatusLog(project=project)
             # update status log type and update test flow or workflow
-            execution = json.dumps({
-                'project': serializers.ProjectSerializer(project).data,
+            execution = {
                 "flows": [
                     {
                         'workflow': project_workflow.data,
-                        'test_case': serializers.TestFlowComponentSerializer(test_case).data
+                        'test_case': serializers.TestFlowComponentSerializer(test_case).data,
                     }
-                ]
-            })
+                ],
+                "dependencies": []
+            }
             project_status.workflow = json.loads(
                 json.dumps(execution))
             project_status.save()
-            broker.publish(f"{project.selected_agent.agent_key}_new_project_test_case", json.dumps({
-                'project': serializers.ProjectSerializer(project).data,
-                'execution': serializers.ProjectStatusLogSerializer(project_status).data,
-            }))
-            return HttpResponse("", status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+            broker.publish(f"{project.selected_agent.agent_key}_new_project_test_case", json.dumps(
+                serializers.ProjectStatusLogSerializer(project_status).data))
+            return HttpResponse(json.dumps(serializers.ProjectStatusLogSerializer(project_status).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
