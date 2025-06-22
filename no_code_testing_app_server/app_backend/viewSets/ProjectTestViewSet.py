@@ -52,7 +52,6 @@ class ProjectTestViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                         'test_case': serializers.TestFlowComponentSerializer(test_case).data,
                     }
                 ],
-                "dependencies": []
             }
             project_status.workflow = json.loads(
                 json.dumps(execution))

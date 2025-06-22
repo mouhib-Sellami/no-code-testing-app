@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from django.http import HttpResponse
 from rest_framework import status
 import json
+from no_code_testing_app_server.utils.MqttClient import MQTTClient
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = "application/json"
@@ -26,3 +27,31 @@ class ProjectWorkFlowsViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Re
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
 
+    @action(methods=['POST'], url_path="execute-test-flow", url_name="execute-test-flow", detail=True, serializer_class=serializers.ExecuteProjectSerializer)
+    def execute_test_flow(self, request, pk):
+        try:
+            flow = models.ProjectTestFlow.objects.get(id=pk)
+            project: models.Project = flow.project
+            print(project)
+            project.selected_agent_id = request.data['runner_id']
+            print(request.data['runner_id'])
+            project.status = models.Status.LAUNCHPREP
+            project.save(update_fields=['selected_agent', 'status'])
+            broker: MQTTClient = MQTTClient.get_instance()
+            data = {"test_case_id": pk}
+            execution = serializers.WorkflowTestCaseExecuterSerializer(
+                data={"flow_case_id": pk})
+            execution.is_valid(raise_exception=True)
+            print(f"{project.selected_agent.agent_key}_new_project_test_case")
+            project_status = models.ProjectStatusLog(project=project)
+            execution.is_valid(raise_exception=True)
+            project_status.workflow = json.loads(
+                json.dumps(execution.data))
+            project_status.save()
+            broker.publish(f"{project.selected_agent.agent_key}_new_project_test_case", json.dumps(
+                serializers.ProjectStatusLogSerializer(project_status).data))
+            return HttpResponse(json.dumps(execution.data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        except Exception as e:
+            print(e)
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)

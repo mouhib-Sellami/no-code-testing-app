@@ -1,3 +1,5 @@
+from collections import defaultdict, deque
+from django.core.exceptions import ValidationError
 from runner_agent.models import RunnerAgent
 from collections import defaultdict
 from toposort import toposort_flatten
@@ -652,3 +654,96 @@ class ExecuteProjectSerializer(serializers.Serializer):
 #             'execution_order': execution_order,
 #             'dependencies': dependencies
 #         }
+
+
+class TestFlowExecutionComponentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TestFlowComponent
+        fields = "__all__"
+
+    @staticmethod
+    def get_execution_order(test_flow):
+        components = models.TestFlowComponent.objects.filter(
+            test_flow=test_flow)
+        component_ids = set(components.values_list('id', flat=True))
+
+        graph = defaultdict(list)
+        in_degree = defaultdict(int)
+
+        for component in components:
+            in_degree[component.id] = 0
+
+        dependencies = models.TestFlowDependency.objects.filter(
+            source_component__test_flow=test_flow,
+            target_component__test_flow=test_flow
+        )
+
+        for dep in dependencies:
+            source_id = dep.source_component_id
+            target_id = dep.target_component_id
+            graph[source_id].append(target_id)
+            in_degree[target_id] += 1
+
+        queue = deque()
+        result = []
+
+        for component_id in component_ids:
+            if in_degree[component_id] == 0:
+                queue.append(component_id)
+
+        while queue:
+            current_id = queue.popleft()
+            result.append(current_id)
+
+            for neighbor_id in graph[current_id]:
+                in_degree[neighbor_id] -= 1
+                if in_degree[neighbor_id] == 0:
+                    queue.append(neighbor_id)
+
+        if len(result) != len(component_ids):
+            raise ValidationError(
+                "Cycle detected in TestFlowComponent dependencies")
+
+        id_to_component = {c.id: c for c in components}
+        ordered_components = [id_to_component[cid] for cid in result]
+
+        return ordered_components
+
+
+class TestFlowExecutionSerializer(serializers.ModelSerializer):
+    components = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.ProjectTestFlow
+        fields = ['id', 'components']
+
+    def get_components(self, obj):
+        ordered_components = TestFlowExecutionComponentSerializer.get_execution_order(
+            obj)
+        serializer = TestFlowExecutionComponentSerializer(
+            ordered_components, many=True)
+        return serializer.data
+
+
+class WorkflowTestCaseExecuterSerializer(serializers.Serializer):
+    flow_case_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.ProjectTestFlow.objects.all(), source='flow', write_only=True
+    )
+
+    class Meta:
+        fields = ['flows']
+
+    def to_representation(self, instance):
+        flows = TestFlowExecutionSerializer(
+            instance['flow'])
+        flows = flows.data
+        test_flow = []
+        for test_case in flows.get('components', []):
+            execution = TestCaseExecutionSerializer(
+                data={"test_case_id": test_case.get('id')})
+            execution.is_valid(raise_exception=True)
+            test_flow.append({
+                "test_case": test_case,
+                "workflow": execution.data
+            })
+        return {"flows": test_flow}
