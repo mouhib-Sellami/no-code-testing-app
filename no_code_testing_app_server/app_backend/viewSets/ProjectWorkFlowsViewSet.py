@@ -50,7 +50,7 @@ class ProjectWorkFlowsViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Re
             project_status.save()
             broker.publish(f"{project.selected_agent.agent_key}_new_project_test_case", json.dumps(
                 serializers.ProjectStatusLogSerializer(project_status).data))
-            return HttpResponse(json.dumps(execution.data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+            return HttpResponse(json.dumps(serializers.ProjectStatusLogSerializer(project_status).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except Exception as e:
             print(e)
             logger.exception(str(e))

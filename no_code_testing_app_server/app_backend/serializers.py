@@ -731,19 +731,36 @@ class WorkflowTestCaseExecuterSerializer(serializers.Serializer):
     )
 
     class Meta:
-        fields = ['flows']
+        fields = ['flow_case_id']
 
     def to_representation(self, instance):
-        flows = TestFlowExecutionSerializer(
-            instance['flow'])
-        flows = flows.data
+        flow = instance['flow']
+        flows_serializer = TestFlowExecutionSerializer(flow)
+        flows_data = flows_serializer.data
+
+        dependencies = models.TestFlowDependency.objects.filter(
+            source_component__test_flow=flow,
+            target_component__test_flow=flow
+        ).select_related('source_component', 'target_component')
+
+        dependency_list = [
+            {
+                'source_id': dep.source_component_id,
+                'target_id': dep.target_component_id
+            } for dep in dependencies
+        ]
+
         test_flow = []
-        for test_case in flows.get('components', []):
+        for test_case in flows_data.get('components', []):
             execution = TestCaseExecutionSerializer(
                 data={"test_case_id": test_case.get('id')})
             execution.is_valid(raise_exception=True)
             test_flow.append({
                 "test_case": test_case,
-                "workflow": execution.data
+                "workflow": execution.data,
             })
-        return {"flows": test_flow}
+
+        return {
+            "flows": test_flow,
+            "dependencies": dependency_list
+        }
