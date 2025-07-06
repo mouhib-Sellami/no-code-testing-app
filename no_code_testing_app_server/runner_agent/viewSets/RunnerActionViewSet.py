@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework import status
 from django.http import HttpResponse
 from app_backend import models as BACK_MODELS
+from no_code_testing_app_server.minio_bucket.MinioClient import MinioClient
+
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
@@ -14,6 +16,10 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
 
     serializer_class = serializers.RunnerAgentSerializer
     queryset = models.RunnerAgent.objects.all().order_by('created_at')
+
+    def __init__(self, **kwargs):
+        self.minio: MinioClient = MinioClient.get_instance()
+        super().__init__(**kwargs)
 
     @action(url_path="", url_name="", methods=['POST'], serializer_class=serializers.RunnerAgentSerializer, detail=False)
     def register(self, request):
@@ -31,6 +37,8 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
     @action(url_path="update-execution-status", url_name="update-execution-status", methods=['PUT'], detail=False)
     def update_execution_status(self, request):
         try:
+            print("update_execution_status")
+            print(request.data)
             execution = BACK_MODELS.ProjectStatusLog.objects.get(
                 id=request.data['execution_id'])
             project = execution.project
@@ -46,10 +54,21 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
                            'old_status', 'new_status', 'is_failed', 'is_running', 'is_finish'])
             project.status = request.data['status']
             project.save(update_fields=['status'])
+            print(request.data.get("new_payload"))
             if request.data.get("new_payload") != None:
-                execution.workflow = json.loads(request.data.get("new_payload"))
+                execution.workflow = json.loads(
+                    request.data.get("new_payload"))
                 execution.save(update_fields=['workflow'])
             return HttpResponse(json.dumps({'status': 'ok'}), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        except Exception as e:
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+    @action(url_path="upload-test-case-image", url_name="upload-test-case-image", methods=['POST'], detail=False)
+    def upload_test_case_image(self, request):
+        try:
+            for count, x in enumerate(request.FILES.getlist("files")):
+                self.minio.upload_single(x, "test_upload")
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
