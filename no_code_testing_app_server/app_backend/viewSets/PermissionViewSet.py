@@ -1,10 +1,6 @@
-import logging
+from app_backend import serializers, models
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from . import serializers
 from rest_framework.permissions import IsAuthenticated
-from app_backend import models
-from app_user_auth.auth_decorators.decorators import has_permission
-logger = logging.getLogger('no_code_testing_app')
 
 
 class PermissionViewSet(ReadOnlyModelViewSet):

@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from no_code_testing_app_server.config.drf_config import *
-from no_code_testing_app_server.config.workers_config import *
+from no_code_testing_app_server.config import *
 from .logger import LOGGING
 
 
@@ -58,7 +57,8 @@ SHARED_APPS = [
     'app_tenant',
     'app_user_auth',
     'engine',
-    'engine_app'
+    'engine_app',
+    "workflow_builder_config_app"
 ]
 
 TENANT_APPS = [
@@ -66,6 +66,7 @@ TENANT_APPS = [
     'django.contrib.contenttypes',
     'tenant_users.permissions',
     'app_backend',
+    'runner_agent',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [
@@ -98,6 +99,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'app_user_auth.middlewares.PermissionMiddleWare.PermissionMiddleWare',
     'app_user_auth.middlewares.OrgMemberMiddleWare.OrgMemberMiddleWare',
+    'runner_agent.middlewares.RunnerAgentMiddleWare.RunnerAgentMiddleWare',
 ]
 
 # SHOW_PUBLIC_IF_NO_TENANT_FOUND = True

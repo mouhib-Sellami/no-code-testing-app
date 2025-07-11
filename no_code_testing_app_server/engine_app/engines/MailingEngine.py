@@ -1,4 +1,4 @@
-from no_code_testing_app_server.config.singleton_config.Singleton import singleton
+from no_code_testing_app_server.patterns import singleton
 from engine.core.Engine import Engine
 from engine.conf import TASK_TYPE
 

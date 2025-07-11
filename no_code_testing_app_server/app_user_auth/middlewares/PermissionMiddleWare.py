@@ -2,7 +2,7 @@ from no_code_testing_app_server.auth.BearerTokenAuth import BearerTokenAuth
 from django.http import HttpResponse
 CONTENT_TYPE = "application/json"
 
-EXCLUDE_VIEW_FUNC = ["AuthViewSet","DomainViewSet"]
+EXCLUDE_VIEW_FUNC = ["AuthViewSet", "DomainViewSet", "RunnerActionViewSet"]
 
 
 class PermissionMiddleWare:
@@ -12,7 +12,7 @@ class PermissionMiddleWare:
     def process_view(self, request, view_func, view_args, view_kwargs):
         if request.path.startswith('/api') and view_func.__name__ not in EXCLUDE_VIEW_FUNC:
             try:
-                
+
                 user = BearerTokenAuth(
                 ).authenticate(request=request)[0]
                 if user and user.app_user:
@@ -25,7 +25,8 @@ class PermissionMiddleWare:
                     setattr(request, "permissions", [])
             except Exception as e:
                 print(e)
-                return HttpResponse(status=401, content_type=CONTENT_TYPE)
+                pass
+                # return HttpResponse(status=401, content_type=CONTENT_TYPE)
 
     def __call__(self, request):
         return self.get_response(request)

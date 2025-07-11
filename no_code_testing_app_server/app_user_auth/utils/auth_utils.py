@@ -16,7 +16,6 @@ def handle_reset_password_request(user: models.TenantUser):
 def handle_new_user_creation(user: models.TenantUser):
     user.reset_token = create_tiny_token()
     user.is_active = False
-    # add user status active pending invitation send an suspend
     user.save(update_fields=['reset_token', 'is_active'])
     job = appEngineModels.MailJobs.objects.create(
         receiver=user, type=appEngineModels.MailJobs.EmailTypes.NEW_USER)

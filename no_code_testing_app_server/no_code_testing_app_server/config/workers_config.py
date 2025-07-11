@@ -4,7 +4,5 @@ TASK_TYPES = {
 }
 
 TASK_WORKER_CLASS = {
-    'mail': 'engine_workers.EmailWorker.EmailWorker'
+    'mail': 'engine_app.engine_workers.EmailWorker.EmailWorker'
 }
-
-

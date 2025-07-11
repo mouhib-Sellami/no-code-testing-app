@@ -1,21 +1,21 @@
 import logging
-from rest_framework.viewsets import ModelViewSet
-from . import serializers
-from rest_framework.permissions import IsAuthenticated
-from app_backend import models
-from app_user_auth.auth_decorators.decorators import has_permission
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
 from rest_framework import status
+from django.http import HttpResponse
+from app_backend import serializers, models
+from django.core.exceptions import ObjectDoesNotExist
+from app_user_auth.auth_decorators.decorators import has_permission
+from no_code_testing_app_server.shared import BaseModelViewSet
 
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = 'application/json'
 
 
-class RoleModelViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+class RoleModelViewSet(BaseModelViewSet):
+
     serializer_class = serializers.OrgRoleReadSerializer
     queryset = models.OrgRole.objects.all().order_by('created_at')
+
+    search_fields = ["$name","$slug"]
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:

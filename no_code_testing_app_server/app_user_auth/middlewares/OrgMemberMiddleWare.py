@@ -2,7 +2,7 @@ from no_code_testing_app_server.auth.BearerTokenAuth import BearerTokenAuth
 from django.http import HttpResponse
 CONTENT_TYPE = "application/json"
 
-EXCLUDE_VIEW_FUNC = ["AuthViewSet", "DomainViewSet"]
+EXCLUDE_VIEW_FUNC = ["AuthViewSet", "DomainViewSet","RunnerActionViewSet"]
 
 
 class OrgMemberMiddleWare:
