@@ -67,8 +67,14 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
     @action(url_path="upload-test-case-image", url_name="upload-test-case-image", methods=['POST'], detail=False)
     def upload_test_case_image(self, request):
         try:
+            folder_name = request.data['execution_id']
+            self.minio.create_folder(folder_name)
+            file_name = ""
             for count, x in enumerate(request.FILES.getlist("files")):
-                self.minio.upload_single(x, "test_upload")
+                filename = self.minio.upload_single(x, folder_name)
+            file_link = self.minio.get_public_link(folder_name + "/" + filename)
+            return HttpResponse(json.dumps({"public_link": file_link}), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
         except Exception as e:
             logger.exception(str(e))
+            print(e)
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)

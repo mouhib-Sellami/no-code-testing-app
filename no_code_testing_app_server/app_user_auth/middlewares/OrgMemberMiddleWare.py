@@ -19,7 +19,7 @@ class OrgMemberMiddleWare:
                             user.app_user)
             except Exception as e:
                 print(e)
-                pass
+                return HttpResponse(status=401, content_type=CONTENT_TYPE)
 
     def __call__(self, request):
         return self.get_response(request)

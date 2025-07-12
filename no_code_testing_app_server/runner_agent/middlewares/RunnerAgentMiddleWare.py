@@ -13,11 +13,10 @@ class RunnerAgentMiddleWare:
         self.get_response = get_response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if request.path.startswith('/api') and getattr(view_func, 'cls', None) and view_func.cls.__name__ in INCLUDE_VIEW_SET:
+        if request.path.startswith('/api') and view_func.__name__ in INCLUDE_VIEW_SET:
             auth_token_meta = request.META.get('HTTP_AUTH_TOKEN')
             agent_key_meta = request.META.get('HTTP_AGENT_KEY')
             domain = request.META.get('HTTP_HOST')
-
             if auth_token_meta is None or agent_key_meta is None:
                 return HttpResponse(status=403)
 

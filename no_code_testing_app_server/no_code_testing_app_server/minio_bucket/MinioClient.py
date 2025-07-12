@@ -30,8 +30,11 @@ class MinioClient():
                                '/', data=io.BytesIO(b''), length=0)
 
     def get_public_link(self, file):
-        return self.client.get_presigned_url(
-            'GET', self.bucket, file, expires=timedelta(days=7000))
+        file_link = self.client.get_presigned_url(
+            'GET', self.bucket, file, expires=timedelta(days=7))
+        file_link = file_link.replace(
+            os.getenv('MINIO_HOST'), os.getenv('MINIO_PUBLIC_HOST') if os.getenv('MINIO_PUBLIC_HOST') else "localhost:9000")
+        return file_link
 
     def upload_single(self, file, folder_name):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -45,23 +48,24 @@ class MinioClient():
                     temp_file.name,
                     content_type=file.content_type,
                 )
+                return file.name
             except S3Error as e:
                 print(e)
                 raise e
             finally:
                 os.remove(temp_file.name)
-                
-    def upload_single(self, file, folder_name):
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            try:
-                self.client.fput_object(
-                    self.bucket,
-                    str(folder_name)+"/" + file.name,
-                    file.name,
-                    content_type=file.content_type,
-                )
-            except S3Error as e:
-                print(e)
-                raise e
-            finally:
-                os.remove(temp_file.name)
+
+    # def upload_single(self, file, folder_name):
+    #     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+    #         try:
+    #             self.client.fput_object(
+    #                 self.bucket,
+    #                 str(folder_name)+"/" + file.name,
+    #                 file.name,
+    #                 content_type=file.content_type,
+    #             )
+    #         except S3Error as e:
+    #             print(e)
+    #             raise e
+    #         finally:
+    #             os.remove(temp_file.name)

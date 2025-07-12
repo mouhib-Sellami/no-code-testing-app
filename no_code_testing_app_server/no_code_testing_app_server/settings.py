@@ -97,9 +97,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'runner_agent.middlewares.RunnerAgentMiddleWare.RunnerAgentMiddleWare',
     'app_user_auth.middlewares.PermissionMiddleWare.PermissionMiddleWare',
     'app_user_auth.middlewares.OrgMemberMiddleWare.OrgMemberMiddleWare',
-    'runner_agent.middlewares.RunnerAgentMiddleWare.RunnerAgentMiddleWare',
 ]
 
 # SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
