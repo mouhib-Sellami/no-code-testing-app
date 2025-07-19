@@ -10,16 +10,30 @@ jobs:
     name: SSH into VM and Pull Repo
     runs-on: ubuntu-latest
     steps:
-    - name: Execute remote SSH commands using password
+    - name: Connect ssh
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         password: ${{ secrets.PASSWORD }}
-        port: 22
-        script_stop: true
+        script: whoami
+
+    - name: Clone the repo
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
         script: |
-          echo "Connected successfully"
-          whoami
-          hostname
-          pwd
+          cd /home/${{ secrets.USER }}
+          git clone https://github.com/${{ github.repository }}.git || true
+          cd ${{ github.repository }} && git pull origin prod
+    # - name: Deploy Postgres
+    #   uses: appleboy/ssh-action@v1
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USER }}
+    #     password: ${{ secrets.PASSWORD }}
+    #     script: |
+    #       cd /home/${{ secrets.USER }}
+    #       helm upgrade --install chart-a . --namespace production --create-namespace
