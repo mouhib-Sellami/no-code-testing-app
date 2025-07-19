@@ -62,7 +62,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         script: |
           cd no-code-testing-app/deployment/postgres
-          helm upgrade --install emqx .
+          helm upgrade --install postgres .
 
   deploy-pg-admin:
     name: deploy-pg-admin
@@ -76,7 +76,7 @@ jobs:
         username: ${{ secrets.USER }}
         password: ${{ secrets.PASSWORD }}
         script: |
-          cd no-code-testing-app/deployment/posgtres
+          cd no-code-testing-app/deployment/pg-admin
           helm upgrade --install pg-admin .
   deploy-nginx:
     name: Deploy and reload Nginx
