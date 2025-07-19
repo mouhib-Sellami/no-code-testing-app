@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.emqx.name | quote }}
+  labels:
+    app: {{ .Values.emqx.name | quote }}
+    group: {{ .Values.emqx.group | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.emqx.name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.emqx.name | quote }}
+        group: {{ .Values.emqx.group | quote }}
+    spec:
+      {{- if .Values.emqx.volume }}
+      volumes:
+        - name: {{ .Values.emqx.volume.name | quote }}
+          {{- if eq .Values.emqx.volume.kind "PersistentVolumeClaim" }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.emqx.volume.pvc.name | quote }}
+          {{- else if eq .Values.emqx.volume.kind "EmptyDir" }}
+          emptyDir: {}
+          {{- end }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.emqx.container.name | quote }}
+        image: "{{ .Values.emqx.container.image }}"
+        imagePullPolicy: {{ .Values.emqx.container.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.emqx.service.ports.mqttTcp.targetPort }}
+          name: mqtt-tcp
+          protocol: TCP
+        - containerPort: {{ .Values.emqx.service.ports.mqttSsl.targetPort }}
+          name: mqtt-ssl
+          protocol: TCP
+        - containerPort: {{ .Values.emqx.service.ports.ws.targetPort }}
+          name: ws
+          protocol: TCP
+        - containerPort: {{ .Values.emqx.service.ports.wss.targetPort }}
+          name: wss
+          protocol: TCP
+        - containerPort: {{ .Values.emqx.service.ports.dashboard.targetPort }}
+          name: dashboard
+          protocol: TCP
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.emqx.config.name | quote }}
+          - secretRef:
+              name: {{ .Values.emqx.secretConfig.name | quote }}
+        volumeMounts:
+          - name: {{ .Values.emqx.volume.name | quote }}
+            mountPath: {{ .Values.emqx.volume.mountPath | quote }}
+        resources:
+          {{- toYaml .Values.emqx.resources | nindent 12 }}
+      restartPolicy: {{ .Values.restartPolicy }}

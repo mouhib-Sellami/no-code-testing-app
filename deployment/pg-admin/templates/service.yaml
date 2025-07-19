@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.pgAdmin.name }}
+  labels: 
+    group: {{ .Values.pgAdmin.group }}
+spec:
+  type: {{ .Values.pgAdmin.service.type }}
+  selector:             
+    app: {{ .Values.pgAdmin.name }}
+  ports:
+    - protocol: {{ .Values.pgAdmin.service.protocol }}
+      port: {{ .Values.pgAdmin.service.port }}
+      targetPort: {{ .Values.pgAdmin.service.targetPort }}
+      nodePort: {{ .Values.pgAdmin.service.nodePort }}

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.postgres.name | quote }}
+  labels:
+    app: {{ .Values.postgres.name | quote }}
+    group: {{ .Values.postgres.group | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.postgres.name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.postgres.name | quote }}
+        group: {{ .Values.postgres.group | quote }}
+    spec:
+      volumes:
+        - name: {{ .Values.postgres.volume.name | quote }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.postgres.volume.pvc.name | quote }}
+      containers:
+        - name: {{ .Values.postgres.name | quote }}
+          image: {{ .Values.postgres.container.image | quote }}
+          imagePullPolicy: {{ .Values.postgres.container.imagePullPolicy | default "IfNotPresent" | quote }}
+          ports:
+            - name: postgres
+              containerPort: {{ .Values.postgres.container.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.postgres.config.name | quote }}
+            - secretRef:
+                name: {{ .Values.postgres.secretConfig.name | quote }}
+          volumeMounts:             
+            - name: {{ .Values.postgres.volume.name | quote }}
+              mountPath: {{ .Values.postgres.volume.mountPath | quote }}
+          {{- with .Values.postgres.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

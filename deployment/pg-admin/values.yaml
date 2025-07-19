@@ -1,0 +1,35 @@
+replicaCount: 1
+
+pgAdmin:
+  name: pg-admin
+  group: db
+  container:
+    image: dpage/pgadmin4:latest
+    port: 80
+  service:
+    type: NodePort
+    port: 30000
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30000
+  volume:
+    name: pg-admin-storage
+    kind: PersistentVolumeClaim
+    mountPath: /var/lib/pgadmin
+    pvc:
+      name: pg-admin-persistent-volume-claim
+      accessMode: ReadWriteOnce
+      storage: 4Gi
+  config:
+    name: pg-admin-config
+    data:
+      PGADMIN_DEFAULT_EMAIL: root@pg.com
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_CHECK_EMAIL_DELIVERABILITY: "False"
+      PGADMIN_CONFIG_GLOBALLY_DELIVERABLE: "True"
+      PGADMIN_CONFIG_ALLOW_SPECIAL_EMAIL_DOMAINS: "[]"
+  secretConfig:
+    name: pg-admin-secret-config
+    data:
+      PGADMIN_DEFAULT_PASSWORD: cm9vdAo=

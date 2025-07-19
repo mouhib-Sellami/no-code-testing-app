@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: {{ .Values.pgAdmin.volume.kind }}
+metadata:
+  name: {{ .Values.pgAdmin.volume.pvc.name }}
+spec:
+  accessModes:
+    - {{ .Values.pgAdmin.volume.pvc.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.pgAdmin.volume.pvc.storage }}
