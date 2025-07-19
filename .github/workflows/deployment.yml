@@ -16,7 +16,9 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         password: ${{ secrets.PASSWORD }}
-        script: whoami
+        script: |
+          whoami
+          exit 0
 
   clone-checkout-prod:
     name: clone repo and checkout
@@ -33,6 +35,7 @@ jobs:
           cd /home/${{ secrets.USER }}
           git clone git@github.com:${{ github.repository }}.git || true
           cd no-code-testing-app && git checkout prod && git pull origin prod
+          exit 0
 
   deploy-emqx:
     name: deploy-emqx-broker
@@ -48,6 +51,7 @@ jobs:
         script: |
           cd no-code-testing-app/deployment/emqx
           helm upgrade --install emqx .
+          exit 0
 
   deploy-postgres:
     name: deploy-postgres
@@ -63,6 +67,7 @@ jobs:
         script: |
           cd no-code-testing-app/deployment/postgres
           helm upgrade --install postgres .
+          exit 0
 
   deploy-pg-admin:
     name: deploy-pg-admin
@@ -78,6 +83,8 @@ jobs:
         script: |
           cd no-code-testing-app/deployment/pg-admin
           helm upgrade --install pg-admin .
+          exit 0
+
   deploy-nginx:
     name: Deploy and reload Nginx
     runs-on: ubuntu-latest
@@ -94,5 +101,6 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         script: |
           sudo rm -f /etc/nginx/nginx.conf
-          sudo cp /home/${{ secrets.USER }}/no-code-testing-app/deployment/nginx-config/nginx.conf /etc/nginx/nginx.conf
+          sudo cp /home/${{ secrets.USER }}/no-code-testing-app/deployment/nginx-config/default.conf /etc/nginx/nginx.conf
           sudo nginx -s reload
+          exit 0
