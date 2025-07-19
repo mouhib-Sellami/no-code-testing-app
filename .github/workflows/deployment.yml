@@ -26,7 +26,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         script: |
           cd /home/${{ secrets.USER }}
-          git clone https://github.com/${{ github.repository }}.git || true
+          git clone git@github.com:${{ github.repository }}.git || true
           cd no-code-testing-app && git pull origin prod
     # - name: Deploy Postgres
     #   uses: appleboy/ssh-action@v1
