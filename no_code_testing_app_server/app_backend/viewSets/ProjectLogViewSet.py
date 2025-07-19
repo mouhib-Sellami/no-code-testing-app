@@ -16,7 +16,7 @@ CONTENT_TYPE = "application/json"
 
 class ProjectLogViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.ProjectStatusLogSerializer
-    queryset = models.ProjectStatusLog.objects.all()
+    queryset = models.ProjectStatusLog.objects.all().order_by("-updated_at")
     pagination_class = CustomPaginator
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
