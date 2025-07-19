@@ -1,69 +1,42 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.emqx.name | quote }}
+  name: {{ .Values.pgAdmin.name | quote }}
   labels:
-    app: {{ .Values.emqx.name | quote }}
-    group: {{ .Values.emqx.group | quote }}
+    app: {{ .Values.pgAdmin.name | quote }}
+    group: {{ .Values.pgAdmin.group | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.emqx.name | quote }}
+      app: {{ .Values.pgAdmin.name | quote }}
   template:
     metadata:
       labels:
-        app: {{ .Values.emqx.name | quote }}
-        group: {{ .Values.emqx.group | quote }}
+        app: {{ .Values.pgAdmin.name | quote }}
+        group: {{ .Values.pgAdmin.group | quote }}
     spec:
-      {{- if .Values.emqx.volume }}
       volumes:
-        - name: {{ .Values.emqx.volume.name | quote }}
-          {{- if eq .Values.emqx.volume.kind "PersistentVolumeClaim" }}
+        - name: {{ .Values.pgAdmin.volume.name | quote }}
           persistentVolumeClaim:
-            claimName: {{ .Values.emqx.volume.pvc.name | quote }}
-          {{- else if eq .Values.emqx.volume.kind "EmptyDir" }}
-          emptyDir: {}
-          {{- end }}
-      {{- end }}
+            claimName: {{ .Values.pgAdmin.volume.pvc.name | quote }}
       containers:
-        - name: {{ .Values.emqx.container.name | quote }}
-          image: {{ .Values.emqx.container.image | quote }}
-          imagePullPolicy: {{ .Values.emqx.container.pullPolicy | default "IfNotPresent" | quote }}
+        - name: {{ .Values.pgAdmin.name | quote }}
+          image: {{ .Values.pgAdmin.container.image | quote }}
+          imagePullPolicy: {{ .Values.pgAdmin.container.imagePullPolicy | default "IfNotPresent" | quote }}
           ports:
-            - name: mqtt-tcp
-              containerPort: {{ .Values.emqx.service.ports.mqttTcp.targetPort }}
+            - name: pg-admin
+              containerPort: {{ .Values.pgAdmin.container.port }}
               protocol: TCP
-            - name: mqtt-ssl
-              containerPort: {{ .Values.emqx.service.ports.mqttSsl.targetPort }}
-              protocol: TCP
-            - name: ws
-              containerPort: {{ .Values.emqx.service.ports.ws.targetPort }}
-              protocol: TCP
-            - name: wss
-              containerPort: {{ .Values.emqx.service.ports.wss.targetPort }}
-              protocol: TCP
-            - name: dashboard
-              containerPort: {{ .Values.emqx.service.ports.dashboard.targetPort }}
-              protocol: TCP
-          {{- if or .Values.emqx.config .Values.emqx.secretConfig }}
           envFrom:
-            {{- if .Values.emqx.config }}
             - configMapRef:
-                name: {{ .Values.emqx.config.name | quote }}
-            {{- end }}
-            {{- if .Values.emqx.secretConfig }}
+                name: {{ .Values.pgAdmin.config.name | quote }}
             - secretRef:
-                name: {{ .Values.emqx.secretConfig.name | quote }}
-            {{- end }}
-          {{- end }}
-          {{- if .Values.emqx.volume }}
+                name: {{ .Values.pgAdmin.secretConfig.name | quote }}
           volumeMounts:             
-            - name: {{ .Values.emqx.volume.name | quote }}
-              mountPath: {{ .Values.emqx.volume.mountPath | quote }}
-          {{- end }}
-          {{- with .Values.emqx.resources }}
+            - name: {{ .Values.pgAdmin.volume.name | quote }}
+              mountPath: {{ .Values.pgAdmin.volume.mountPath | quote }}
+          {{- with .Values.pgAdmin.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      restartPolicy: {{ .Values.restartPolicy }}
