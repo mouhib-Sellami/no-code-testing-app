@@ -6,8 +6,8 @@ on:
     - prod
 
 jobs:
-  build:
-    name: Build
+  connect-and-pull:
+    name: SSH into VM and Pull Repo
     runs-on: ubuntu-latest
     steps:
     - name: Execute remote SSH commands using password
@@ -18,3 +18,4 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: 22
         script: whoami
+        run: whoami
