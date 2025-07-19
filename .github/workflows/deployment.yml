@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: clone-checkout-prod
     steps:
-    - name: Clone the repo
+    - name: deploy-emqx
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.HOST }}
@@ -48,3 +48,33 @@ jobs:
         script: |
           cd no-code-testing-app/deployment/emqx
           helm upgrade --install emqx .
+
+  deploy-postgres:
+    name: deploy-postgres
+    runs-on: ubuntu-latest
+    needs: clone-checkout-prod
+    steps:
+    - name: deploy-postgres
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          cd no-code-testing-app/deployment/postgres
+          helm upgrade --install emqx .
+
+  deploy-pg-admin:
+    name: deploy-pg-admin
+    runs-on: ubuntu-latest
+    needs: clone-checkout-prod
+    steps:
+    - name: deploy-pg-admin
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          cd no-code-testing-app/deployment/posgtres
+          helm upgrade --install pg-admin .
