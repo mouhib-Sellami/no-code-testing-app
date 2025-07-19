@@ -17,4 +17,9 @@ jobs:
         username: ${{ secrets.USER }}
         password: ${{ secrets.PASSWORD }}
         port: 22
-        script: whoami
+        script_stop: true
+        script: |
+          echo "Connected successfully"
+          whoami
+          hostname
+          pwd
