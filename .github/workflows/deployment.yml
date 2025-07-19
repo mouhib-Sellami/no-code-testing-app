@@ -78,3 +78,21 @@ jobs:
         script: |
           cd no-code-testing-app/deployment/posgtres
           helm upgrade --install pg-admin .
+  deploy-nginx:
+    name: Deploy and reload Nginx
+    runs-on: ubuntu-latest
+    needs:
+    - deploy-emqx
+    - deploy-postgres
+    - deploy-pg-admin
+    steps:
+    - name: Replace nginx.conf and reload nginx
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          sudo rm -f /etc/nginx/nginx.conf
+          sudo cp /home/${{ secrets.USER }}/no-code-testing-app/deployment/nginx-config/nginx.conf /etc/nginx/nginx.conf
+          sudo nginx -s reload
