@@ -18,6 +18,10 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         script: whoami
 
+  clone-checkout-prod:
+    name: clone repo and checkout
+    runs-on: ubuntu-latest
+    steps:
     - name: Clone the repo
       uses: appleboy/ssh-action@v1
       with:
