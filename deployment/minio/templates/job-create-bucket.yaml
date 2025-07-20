@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-minio-bucket
+  labels:
+    app: create-minio-bucket
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        app: create-minio-bucket
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: minio/mc:RELEASE.2025-02-21T16-00-46Z
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.minio.config.name }}
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.minio.secretConfig.name }}
+                  key: MINIO_ROOT_PASSWORD
+            - name: MINIO_HOST
+              value: "http://{{ .Values.minio.name }}:{{ .Values.minio.service.ports.minioPort.port }}"
+          command:
+            - sh
+            - -c
+            - |
+                until mc ls minio > /dev/null 2>&1; do
+                sleep 0.5
+                done
+                mc mb minio/{{ .Values.minio.config.data.MINIO_DEFAULT_BUCKETS }} || true

@@ -1,0 +1,43 @@
+replicaCount: 1
+
+minio:
+  name: minio
+  group: minio
+  container:
+    name: minio-bucket
+    image: minio/minio:RELEASE.2025-02-28T09-55-16Z
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    ports:
+      minioPort:
+        port: 9000
+        targetPort: 9000
+        nodePort: 30006
+      minioConsole:
+        port: 9001
+        targetPort: 9001
+        nodePort: 30007
+  volume:
+    name: minio-storage
+    kind: PersistentVolumeClaim
+    mountPath: /data
+    pvc:
+      name: minio-persistent-volume-claim
+      accessMode: ReadWriteOnce
+      storage: 10Gi
+  config:
+    name: minio-config
+    data:
+      MINIO_ROOT_USER: root
+      MINIO_DEFAULT_BUCKETS: server-bucket-2
+      MINIO_BROWSER_REDIRECT_URL: http://localhost/bucket-console/
+  secretConfig:
+    name: minio-secret-config
+    data:
+      MINIO_ROOT_PASSWORD: YWRtaW4xMjM0Cg==
+  args:
+  - server
+  - /data
+  - "--console-address"
+  - ":9001"

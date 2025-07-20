@@ -1,0 +1,29 @@
+replicaCount: 1
+
+postgres:
+  name: postgres
+  group: db
+  container:
+    image: postgres:latest
+    port: 5432
+  service:
+    type: ClusterIP
+    port: 5432
+  volume:
+    name: postgres-storage
+    kind: PersistentVolumeClaim
+    mountPath: /var/lib/postgresql/data
+    pvc:
+      name: postgres-persistent-volume-claim
+      accessMode: ReadWriteOnce
+      storage: 4Gi
+  config:
+    name: postgres-config
+    data:
+      POSTGRES_DB: no_code_app_dev
+      POSTGRES_USER: postgres
+
+  secretConfig:
+    name: postgres-secret-config
+    data:
+      POSTGRES_PASSWORD: cG9zdGdyZXM=

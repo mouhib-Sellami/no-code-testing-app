@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.minio.name | quote }}
+  labels:
+    app: {{ .Values.minio.name | quote }}
+    group: {{ .Values.minio.group | quote }}
+spec:
+  type: {{ .Values.minio.service.type | default "NodePort" | quote }}
+  selector:
+    app: {{ .Values.minio.name | quote }}
+  ports:
+    - name: minio-server
+      port: {{ .Values.minio.service.ports.minioPort.port | default 9000 }}
+      targetPort: {{ .Values.minio.service.ports.minioPort.targetPort | default 9000 }}
+      protocol: TCP
+      {{- if eq .Values.minio.service.type "NodePort" }}
+      nodePort: {{ .Values.minio.service.ports.minioPort.nodePort | default 30006 }}
+      {{- end }}
+    - name: minio-console
+      port: {{ .Values.minio.service.ports.minioConsole.port | default 9001 }}
+      targetPort: {{ .Values.minio.service.ports.minioConsole.targetPort | default 9001 }}
+      protocol: TCP
+      {{- if eq .Values.minio.service.type "NodePort" }}
+      nodePort: {{ .Values.minio.service.ports.minioConsole.nodePort | default 30007 }}
+      {{- end }}

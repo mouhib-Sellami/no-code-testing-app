@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.emqx.name | quote }}
+  labels:
+    app: {{ .Values.emqx.name | quote }}
+    group: {{ .Values.emqx.group | quote }}
+spec:
+  type: {{ .Values.emqx.service.type | default "NodePort" | quote }}
+  selector:
+    app: {{ .Values.emqx.name | quote }}
+  ports:
+    - name: mqtt-tcp
+      port: {{ .Values.emqx.service.ports.mqttTcp.port | default 1883 }}
+      targetPort: {{ .Values.emqx.service.ports.mqttTcp.targetPort | default 1883 }}
+      protocol: TCP
+      {{- if eq .Values.emqx.service.type "NodePort" }}
+      nodePort: {{ .Values.emqx.service.ports.mqttTcp.nodePort | default 30001 }}
+      {{- end }}
+    - name: mqtt-ssl
+      port: {{ .Values.emqx.service.ports.mqttSsl.port | default 8883 }}
+      targetPort: {{ .Values.emqx.service.ports.mqttSsl.targetPort | default 8883 }}
+      protocol: TCP
+      {{- if eq .Values.emqx.service.type "NodePort" }}
+      nodePort: {{ .Values.emqx.service.ports.mqttSsl.nodePort | default 30002 }}
+      {{- end }}
+    - name: ws
+      port: {{ .Values.emqx.service.ports.ws.port | default 8083 }}
+      targetPort: {{ .Values.emqx.service.ports.ws.targetPort | default 8083 }}
+      protocol: TCP
+      {{- if eq .Values.emqx.service.type "NodePort" }}
+      nodePort: {{ .Values.emqx.service.ports.ws.nodePort | default 30003 }}
+      {{- end }}
+    - name: wss
+      port: {{ .Values.emqx.service.ports.wss.port | default 8084 }}
+      targetPort: {{ .Values.emqx.service.ports.wss.targetPort | default 8084 }}
+      protocol: TCP
+      {{- if eq .Values.emqx.service.type "NodePort" }}
+      nodePort: {{ .Values.emqx.service.ports.wss.nodePort | default 30004 }}
+      {{- end }}
+    - name: dashboard
+      port: {{ .Values.emqx.service.ports.dashboard.port | default 18083 }}
+      targetPort: {{ .Values.emqx.service.ports.dashboard.targetPort | default 18083 }}
+      protocol: TCP
+      {{- if eq .Values.emqx.service.type "NodePort" }}
+      nodePort: {{ .Values.emqx.service.ports.dashboard.nodePort | default 30005 }}
+      {{- end }}

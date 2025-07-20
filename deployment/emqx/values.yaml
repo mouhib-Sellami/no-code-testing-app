@@ -1,0 +1,59 @@
+replicaCount: 1
+restartPolicy: Always
+
+emqx:
+  name: emqx
+  group: mqtt
+  service:
+    type: NodePort
+    ports:
+      mqttTcp:
+        port: 1883
+        targetPort: 1883
+        nodePort: 30001
+      mqttSsl:
+        port: 8883
+        targetPort: 8883
+        nodePort: 30002
+      ws:
+        port: 8083
+        targetPort: 8083
+        nodePort: 30003
+      wss:
+        port: 8084
+        targetPort: 8084
+        nodePort: 30004
+      dashboard:
+        port: 18083
+        targetPort: 18083
+        nodePort: 30005
+  container:
+    name: app-emqx-broker
+    image: emqx/emqx:5.8.4
+    pullPolicy: IfNotPresent
+  volume:
+    name: emqx-storage
+    kind: EmptyDir
+    mountPath: /opt/emqx/data
+  config:
+    name: emqx-config
+    data:
+      EMQX_NAME: "emqx"
+      EMQX_HOST: "0.0.0.0"
+      EMQX_NODE_NAME: "emqx@127.0.0.1"
+      EMQX_CLUSTER__DISCOVERY_STRATEGY: "static"
+      EMQX_DASHBOARD__ENABLED: "true"
+      MQTT_BROKER_HOST: "emqx"
+      EMQX_AUTH__PASSWORD__ENABLED: "true"
+      EMQX_LISTENER__TCP__DEFAULT: "1883"
+      EMQX_LISTENER__SSL__DEFAULT: "8883"
+      EMQX_LISTENER__WS__DEFAULT: "8083"
+      EMQX_LISTENER__WSS__DEFAULT: "8084"
+  secretConfig:
+    name: emqx-secret-config
+    data:
+      EMQX_DASHBOARD__DEFAULT_USER__PASSWORD: "YWRtaW4xMjM="
+      EMQX_DASHBOARD__DEFAULT_USERNAME: "YWRtaW4="
+      EMQX_DEFAULT_PASSWORD: "YWRtaW4xMjM="
+      EMQX_DEFAULT_USERNAME: "YWRtaW4="
+  resources: {}
