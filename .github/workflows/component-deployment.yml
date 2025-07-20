@@ -1,4 +1,4 @@
-name: Deploy APP TO PROD
+name: SetUp server component
 
 on:
   workflow_dispatch:
