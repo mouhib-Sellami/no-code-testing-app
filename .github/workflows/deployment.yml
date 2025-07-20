@@ -1,9 +1,8 @@
 name: Deploy APP TO PROD
 
 on:
-  push:
-    branches:
-    - prod
+  workflow_dispatch:
+
 
 jobs:
   connect-ssh:
