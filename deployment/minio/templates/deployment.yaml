@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.minio.name | quote }}
+  labels:
+    app: {{ .Values.minio.name | quote }}
+    group: {{ .Values.minio.group | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.minio.name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.minio.name | quote }}
+        group: {{ .Values.minio.group | quote }}
+    spec:
+      volumes:
+        - name: {{ .Values.minio.volume.name | quote }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.minio.volume.pvc.name | quote }}
+      containers:
+        - name: {{ .Values.minio.container.name | quote }}
+          image: {{ .Values.minio.container.image | quote }}
+          imagePullPolicy: {{ .Values.minio.container.pullPolicy | quote }}
+          args:
+            {{- toYaml .Values.minio.args | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.minio.service.ports.minioPort.targetPort }}
+              name: minio-server
+              protocol: TCP
+            - containerPort: {{ .Values.minio.service.ports.minioConsole.targetPort }}
+              name: minio-console
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.minio.config.name | quote }}
+            - secretRef:
+                name: {{ .Values.minio.secretConfig.name | quote }}
+          volumeMounts:
+            - name: {{ .Values.minio.volume.name | quote }}
+              mountPath: {{ .Values.minio.volume.mountPath | quote }}
+          {{- with .Values.minio.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

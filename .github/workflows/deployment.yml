@@ -84,6 +84,21 @@ jobs:
           cd no-code-testing-app/deployment/pg-admin
           helm upgrade --install pg-admin .
           exit 0
+  deploy-minio:
+    name: deploy-minio
+    runs-on: ubuntu-latest
+    needs: clone-checkout-prod
+    steps:
+    - name: deploy-minio
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          cd no-code-testing-app/deployment/minio
+          helm upgrade --install minio .
+          exit 0
 
   deploy-nginx:
     name: Deploy and reload Nginx
