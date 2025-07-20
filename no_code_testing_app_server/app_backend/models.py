@@ -238,7 +238,7 @@ class TestFlowDependency(models.Model):
 class ProjectTestFlowAtomicCases(BaseModel):
     name = models.CharField(max_length=255, null=False, blank=False)
     project = models.ForeignKey(
-        Project, related_name="test_flows", on_delete=models.CASCADE)
+        Project, related_name="test_atomic_flows", on_delete=models.CASCADE)
     test_cases = models.ManyToManyField(ProjectTestCase, blank=True)
 
     def __str__(self):

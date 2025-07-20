@@ -47,6 +47,12 @@ make-migrations:
 migrate:
 	@$(DJANGO_PYTHON) manage.py migrate --skip-check
 
+dump-providers:
+	@$(DJANGO_PYTHON) manage.py export_providers_config --skip-check
+
+load-providers:
+	@$(DJANGO_PYTHON) manage.py load_providers_config --skip-check
+
 migration:
 	@$(DJANGO_PYTHON) manage.py makemigrations --skip-check
 	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared --skip-check
@@ -56,6 +62,7 @@ deploy-server:
 	@$(DJANGO_PYTHON) manage.py makemigrations --skip-check
 	@$(DJANGO_PYTHON) manage.py migrate_schemas --shared --skip-check
 	@$(DJANGO_PYTHON) manage.py collectstatic --skip-check
+	@$(DJANGO_PYTHON) manage.py load_providers_config --skip-check
 	@$(DJANGO_PYTHON) manage.py create_public_tenant --domain_url localhost --owner_email admin@domain.com
 	@$(DJANGO_PYTHON) manage.py create_tenant_superuser --username=root --schema=public
 
