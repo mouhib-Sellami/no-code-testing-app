@@ -108,6 +108,7 @@ jobs:
     - deploy-emqx
     - deploy-postgres
     - deploy-pg-admin
+    - deploy-minio
     steps:
     - name: Replace nginx.conf and reload nginx
       uses: appleboy/ssh-action@v1
