@@ -84,6 +84,7 @@ jobs:
           cd no-code-testing-app/deployment/pg-admin
           helm upgrade --install pg-admin .
           exit 0
+
   deploy-minio:
     name: deploy-minio
     runs-on: ubuntu-latest
