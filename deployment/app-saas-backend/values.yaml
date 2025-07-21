@@ -32,7 +32,7 @@ saasBackend:
       APP_NAME: "Auto test builder"
       MINIO_HOST: "minio-clusterip.default.svc.cluster.local:9000"
       MINIO_HOST_PROTOCOL: "http://"
-      MINIO_PUBLIC_HOST: http://dg1j75rwzy.oxahost.svr.computeservers.oxa.host/minio
+      MINIO_PUBLIC_HOST: dg1j75rwzy.oxahost.svr.computeservers.oxa.host/minio
       MINIO_DEFAULT_BUCKETS: server-bucket
       MQTT_BROKER_HOST: "emqx-clusterip.default.svc.cluster.local"
       EMQX_MQTT_TCP_PORT: "1883"
