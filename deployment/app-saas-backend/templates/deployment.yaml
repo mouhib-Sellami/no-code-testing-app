@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.saasBackend.name | quote }}
+  labels:
+    app: {{ .Values.saasBackend.name | quote }}
+    group: {{ .Values.saasBackend.group | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.saasBackend.name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.saasBackend.name | quote }}
+        group: {{ .Values.saasBackend.group | quote }}
+    spec:
+      containers:
+        - name: {{ .Values.saasBackend.name | quote }}
+          image: "{{ .Values.saasBackend.container.image }}:{{ .Values.saasBackend.container.tag }}"
+          imagePullPolicy: {{ .Values.saasBackend.container.imagePullPolicy | default "IfNotPresent" | quote }}
+          ports:
+            - name: saas-bakend
+              containerPort: {{ .Values.saasBackend.container.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.saasBackend.config.name | quote }}
+            - secretRef:
+                name: {{ .Values.saasBackend.secretConfig.name | quote }}
