@@ -34,7 +34,7 @@ saasBackend:
       MINIO_HOST_PROTOCOL: "http://"
       MINIO_PUBLIC_HOST: http://dg1j75rwzy.oxahost.svr.computeservers.oxa.host/minio
       MINIO_DEFAULT_BUCKETS: server-bucket
-      MQTT_BROKER_HOST: "emqx-clusterip.default.dvc.cluster.local"
+      MQTT_BROKER_HOST: "emqx-clusterip.default.svc.cluster.local"
       EMQX_MQTT_TCP_PORT: "1883"
       APP_URL: "dg1j75rwzy.oxahost.svr.computeservers.oxa.host"
   secretConfig:
