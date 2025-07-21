@@ -112,3 +112,21 @@ jobs:
           cd no-code-testing-app/deployment/app-saas-backend
           helm upgrade --install backend . --set saasApp.container.tag=${{ needs.build-and-push-image.outputs.version }}
           exit 0
+
+  deploy-nginx:
+    name: Deploy and reload Nginx
+    runs-on: ubuntu-latest
+    needs:
+    - deploy-backend
+    steps:
+    - name: Replace nginx.conf and reload nginx
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          sudo rm -f /etc/nginx/nginx.conf
+          sudo cp /home/${{ secrets.USER }}/no-code-testing-app/deployment/nginx-config/default.conf /etc/nginx/nginx.conf
+          sudo nginx -s reload
+          exit 0
