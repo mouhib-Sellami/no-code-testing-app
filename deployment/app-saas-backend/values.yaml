@@ -36,6 +36,7 @@ saasBackend:
       MINIO_DEFAULT_BUCKETS: server-bucket
       MQTT_BROKER_HOST: "emqx-clusterip.default.dvc.cluster.local"
       EMQX_MQTT_TCP_PORT: "1883"
+      APP_URL: "dg1j75rwzy.oxahost.svr.computeservers.oxa.host"
   secretConfig:
     name: saas-app-backend-secret-config
     data:
