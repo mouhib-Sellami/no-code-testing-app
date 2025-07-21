@@ -110,7 +110,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         script: |
           cd no-code-testing-app/deployment/app-saas-backend
-          helm upgrade --install backend . --set saasApp.container.tag=${{ needs.build-and-push-image.outputs.version }}
+          helm upgrade --install backend . --set saasBackend.container.tag=${{ needs.build-and-push-image.outputs.version }}
           exit 0
 
   deploy-nginx:
