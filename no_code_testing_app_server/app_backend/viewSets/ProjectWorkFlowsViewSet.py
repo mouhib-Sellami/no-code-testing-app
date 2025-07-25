@@ -32,9 +32,7 @@ class ProjectWorkFlowsViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Re
         try:
             flow = models.ProjectTestFlow.objects.get(id=pk)
             project: models.Project = flow.project
-            print(project)
             project.selected_agent_id = request.data['runner_id']
-            print(request.data['runner_id'])
             project.status = models.Status.LAUNCHPREP
             project.save(update_fields=['selected_agent', 'status'])
             broker: MQTTClient = MQTTClient.get_instance()
@@ -42,7 +40,6 @@ class ProjectWorkFlowsViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Re
             execution = serializers.WorkflowTestCaseExecuterSerializer(
                 data={"flow_case_id": pk})
             execution.is_valid(raise_exception=True)
-            print(f"{project.selected_agent.agent_key}_new_project_test_case")
             project_status = models.ProjectStatusLog(project=project)
             execution.is_valid(raise_exception=True)
             project_status.workflow = json.loads(

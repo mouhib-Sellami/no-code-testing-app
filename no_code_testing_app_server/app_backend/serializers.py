@@ -201,7 +201,6 @@ class CreateTestFlowComponentSerializer(serializers.Serializer):
     def create(self, validated_data):
         flow = validated_data['flow']
         test_case = validated_data['testcase']
-        print("*"*10)
         new_flow_component = models.TestFlowComponent.clone_from_test_case(
             test_case=test_case,
             test_flow=flow,
@@ -352,85 +351,6 @@ class TestFlowEdgeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TestFlowDependency
         fields = '__all__'
-
-
-# class ProjectComponentExecutionSerializer(serializers.Serializer):
-#     project_id = serializers.IntegerField()
-#     components = serializers.SerializerMethodField()
-#     execution_order = serializers.SerializerMethodField()
-#     dependencies = serializers.SerializerMethodField()
-
-#     def get_components(self, obj):
-#         project_id = obj['project_id']
-#         components = models.ProjectComponent.objects.filter(
-#             project_id=project_id)
-#         return ProjectComponentSerializer(components, many=True).data
-
-#     def get_dependencies(self, obj):
-#         project_id = obj['project_id']
-#         dependencies = models.ComponentDependency.objects.filter(
-#             source_component__project_id=project_id
-#         )
-#         return ComponentDependencySerializer(dependencies, many=True).data
-
-#     def get_execution_order(self, obj):
-#         project_id = obj['project_id']
-#         components = models.ProjectComponent.objects.filter(
-#             project_id=project_id)
-#         graph = defaultdict(set)
-#         component_ids = set()
-#         for component in components:
-#             component_ids.add(component.id)
-#             for dep in component.outgoing_dependencies.filter(dependency_type=models.DependencyType.RUN_AFTER):
-#                 if dep.target_component.project_id == project_id:
-#                     graph[component.id].add(dep.target_component.id)
-
-#         try:
-#             ordered_ids = toposort_flatten(graph)
-#             ordered_ids = [cid for cid in ordered_ids if cid in component_ids]
-#             id_to_name = {c.id: c.name for c in components}
-#             return [{'id': cid, 'name': id_to_name.get(cid, 'Unknown')} for cid in ordered_ids]
-#         except ValueError:
-#             raise serializers.ValidationError(
-#                 "Circular RUN_AFTER dependencies detected.")
-
-#     def validate(self, data):
-#         project_id = data['project_id']
-#         if not models.ProjectComponent.objects.filter(project_id=project_id).exists():
-#             raise serializers.ValidationError(
-#                 f"No components found for project_id {project_id}")
-#         return data
-
-#     def to_representation(self, instance):
-#         data = super().to_representation(instance)
-#         components = data['components']
-#         execution_order = data['execution_order']
-#         dependencies = data['dependencies']
-
-#         component_dict = {comp['id']: comp for comp in components}
-
-#         for comp in components:
-#             comp['depends_on'] = [
-#                 dep['source_component_id']
-#                 for dep in dependencies
-#                 if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.DEPENDENCY.value
-#             ]
-#             comp['run_after'] = [
-#                 dep['source_component_id']
-#                 for dep in dependencies
-#                 if dep.get('target_component_id') == comp['id'] and dep['dependency_type'] == models.DependencyType.RUN_AFTER.value
-#             ]
-
-#         if any('target_component_id' not in dep for dep in dependencies):
-#             print(
-#                 "Warning: Some dependencies missing 'target_component_id':", dependencies)
-#         return {
-#             'project_id': instance['project_id'],
-#             'components': component_dict,
-#             'execution_order': execution_order,
-#             'dependencies': dependencies
-#         }
-
 
 class TestCaseExecutionSerializer(serializers.Serializer):
     test_case_id = serializers.IntegerField()

@@ -200,8 +200,9 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
-MEDIA_URL = "/media/"
+
 STATIC_FOLDER_NAME = "static"
+MEDIA_FOLDER_NAME = "static"
 
 
 def make_dir_path(path):

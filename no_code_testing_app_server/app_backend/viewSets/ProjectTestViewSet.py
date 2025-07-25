@@ -42,7 +42,6 @@ class ProjectTestViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
             project_workflow = serializers.TestCaseExecutionSerializer(
                 data=data)
             project_workflow.is_valid(raise_exception=True)
-            print(f"{project.selected_agent.agent_key}_new_project_test_case")
             project_status = models.ProjectStatusLog(project=project)
             # update status log type and update test flow or workflow
             execution = {

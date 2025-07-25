@@ -57,20 +57,7 @@ class ProjectModelViewSet(BaseModelViewSet):
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
-
-    # @has_permission("can_change_project")
-    # @action(methods=['GET'], url_path="components", url_name="components", detail=True, serializer_class=serializers.ProjectComponentSerializer)
-    # def components(self, request, pk=None, *args, **kwargs):
-    #     try:
-    #         components = models.ProjectComponent.objects.filter(
-    #             project__id=pk).all()
-    #         return HttpResponse(json.dumps(serializers.ProjectComponentSerializer(components, many=True).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
-    #     except ObjectDoesNotExist as e:
-    #         return HttpResponse(status=status.HTTP_404_NOT_FOUND, content_type=CONTENT_TYPE)
-    #     except Exception as e:
-    #         logger.exception(str(e))
-    #         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
-
+        
     @has_permission("can_change_project")
     @action(methods=['GET'], url_path="test-cases", url_name="test-cases", detail=True, serializer_class=serializers.ProjectTestCaseSerializer)
     def test_cases(self, request, pk=None, *args, **kwargs):
@@ -97,31 +84,3 @@ class ProjectModelViewSet(BaseModelViewSet):
         except Exception as e:
             logger.exception(str(e))
             return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
-
-    # @has_permission("can_change_project")
-    # @action(methods=['POST'], url_path="execute", url_name="execute", detail=True, serializer_class=serializers.ExecuteProjectSerializer)
-    # def execute(self, request, pk):
-    #     try:
-    #         project: models.Project = models.Project.objects.get(id=pk)
-    #         project.selected_agent_id = request.data['runner_id']
-    #         project.status = models.Status.LAUNCHPREP
-    #         project.save(update_fields=['selected_agent', 'status'])
-    #         broker: MQTTClient = MQTTClient.get_instance()
-    #         data = {'project_id':  project.id}
-    #         project_workflow = serializers.ProjectComponentExecutionSerializer(
-    #             data=data)
-    #         project_workflow.is_valid(raise_exception=True)
-    #         print(f"{project.selected_agent.agent_key}_new_project")
-    #         project_status = models.ProjectStatusLog(project=project)
-    #         project_status.workflow = json.loads(
-    #             json.dumps(project_workflow.data))
-    #         project_status.save()
-    #         broker.publish(f"{project.selected_agent.agent_key}_new_project", json.dumps({
-    #             'project': serializers.ProjectSerializer(project).data,
-    #             'execution': serializers.ProjectStatusLogSerializer(project_status).data,
-    #             'workflow': project_workflow.data
-    #         }))
-    #         return HttpResponse(json.dumps(serializers.ProjectStatusLogSerializer(project_status).data), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
-    #     except Exception as e:
-    #         logger.exception(str(e))
-    #         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)

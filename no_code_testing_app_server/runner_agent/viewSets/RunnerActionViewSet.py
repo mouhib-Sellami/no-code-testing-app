@@ -37,8 +37,6 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
     @action(url_path="update-execution-status", url_name="update-execution-status", methods=['PUT'], detail=False)
     def update_execution_status(self, request):
         try:
-            print("update_execution_status")
-            print(request.data)
             execution = BACK_MODELS.ProjectStatusLog.objects.get(
                 id=request.data['execution_id'])
             project = execution.project
@@ -54,7 +52,6 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
                            'old_status', 'new_status', 'is_failed', 'is_running', 'is_finish'])
             project.status = request.data['status']
             project.save(update_fields=['status'])
-            print(request.data.get("new_payload"))
             if request.data.get("new_payload") != None:
                 execution.workflow = json.loads(
                     request.data.get("new_payload"))

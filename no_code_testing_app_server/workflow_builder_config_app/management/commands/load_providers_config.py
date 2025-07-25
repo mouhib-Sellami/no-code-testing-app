@@ -16,7 +16,6 @@ class Command(BaseCommand):
         folder_path = os.path.join(
             os.getcwd(), 'workflow_builder_config_app', "providers-config")
         file_path = os.path.join(folder_path, 'providers.json')
-        print(file_path)
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"{file_path} does not exist")
 

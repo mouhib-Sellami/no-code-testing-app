@@ -10,7 +10,7 @@ from no_code_testing_app_server.utils.modelValidate import validate_image_extens
 class Tenant(TenantBase, BaseModel):
     def generate_upload_path(self, filename):
         upload_folder = os.path.join(
-            settings.MEDIA_ROOT, self.name)
+            settings.MEDIA_FOLDER_NAME, self.name)
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
         return os.path.join(upload_folder, f'{uuid4()}-{filename}')

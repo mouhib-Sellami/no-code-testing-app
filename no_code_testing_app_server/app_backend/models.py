@@ -130,7 +130,6 @@ class TestFlowComponent(ProjectTestCase):
 
     @classmethod
     def clone_from_test_case(cls, test_case, test_flow, extra_data=None):
-        print("here")
         with transaction.atomic():
 
             flow_test_case = cls(
@@ -140,14 +139,11 @@ class TestFlowComponent(ProjectTestCase):
                 is_reference=False,  # to change false
                 project=test_case.project
             )
-            print("here")
             flow_test_case.save()
-            print(flow_test_case)
             project_components = ProjectComponent.objects.filter(
                 project_test_case=test_case)
 
             component_mapping = {}
-            print(project_components)
             for project_component in project_components:
                 new_component = ProjectComponent(
                     name=project_component.name,
@@ -162,7 +158,6 @@ class TestFlowComponent(ProjectTestCase):
                     project_test_case=flow_test_case,
                     builder_config=project_component.builder_config,
                 )
-                print(new_component)
                 new_component.save()
                 try:
                     new_extra_args = []
