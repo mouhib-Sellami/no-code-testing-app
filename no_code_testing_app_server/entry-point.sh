@@ -4,7 +4,7 @@ python3 manage.py makemigrations --skip-check
 python3 manage.py migrate_schemas --shared --skip-check
 python3 manage.py collectstatic --noinput --skip-check
 python3 manage.py load_providers_config --skip-check
-python3 manage.py create_public_tenant --domain_url localhost --owner_email admin@domain.com --skip-check
+python3 manage.py create_public_tenant --domain_url $APP_URL --owner_email admin@domain.com --skip-check
 python manage.py custom_create_tenant_superuser --schema public --skip-checks
 
 gunicorn \
