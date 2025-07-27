@@ -51,6 +51,66 @@
   },
   {
     "fields": {
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "label": "text",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00",
+      "value": null
+    },
+    "model": "workflow_builder_config_app.kwarg",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "label": "partial",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00",
+      "value": "false"
+    },
+    "model": "workflow_builder_config_app.kwarg",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "label": "frame_id",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00",
+      "value": null
+    },
+    "model": "workflow_builder_config_app.kwarg",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "label": "option_value",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00",
+      "value": null
+    },
+    "model": "workflow_builder_config_app.kwarg",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "action_name": "get",
+      "created_at": "2025-07-20 21:53:35.196429+00:00",
+      "default_arguments": [],
+      "extra_arguments": [
+        1
+      ],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": false,
+      "module": null,
+      "name": "Navigate",
+      "type": "input",
+      "updated_at": "2025-07-20 21:53:35.196440+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 1
+  },
+  {
+    "fields": {
       "action_name": "find_element",
       "created_at": "2025-05-21 21:15:35.314816+00:00",
       "default_arguments": [
@@ -215,43 +275,197 @@
   },
   {
     "fields": {
-      "action_name": "get",
-      "created_at": "2025-07-20 21:53:35.196429+00:00",
+      "action_name": "refresh",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
       "default_arguments": [],
-      "extra_arguments": [
-        1
-      ],
+      "extra_arguments": [],
       "extra_download_assets": "",
       "initial_config": null,
       "is_default": false,
       "is_function": false,
       "module": null,
-      "name": "Navigate",
-      "type": "input",
-      "updated_at": "2025-07-20 21:53:35.196440+00:00"
+      "name": "Refresh page",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
     },
     "model": "workflow_builder_config_app.component",
-    "pk": 1
+    "pk": 10
   },
   {
     "fields": {
-      "components": [
-        1
-      ],
+      "action_name": "back",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": false,
+      "module": null,
+      "name": "Navigate back",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "action_name": "forward",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": false,
+      "module": null,
+      "name": "Navigate forward",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "action_name": "double_click",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": true,
+      "module": null,
+      "name": "Double click",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "action_name": "context_click",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": true,
+      "module": null,
+      "name": "Right click",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "action_name": "assert_element_contains_text",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [2, 6, 7],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": true,
+      "module": null,
+      "name": "Assert contains text",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "action_name": "assert_url_contains",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [6],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": false,
+      "module": null,
+      "name": "Assert URL contains",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 16
+  },
+  {
+    "fields": {
+      "action_name": "switch_to_frame",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [8],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": false,
+      "module": null,
+      "name": "Switch to frame",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 17
+  },
+  {
+    "fields": {
+      "action_name": "switch_to_default_content",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": false,
+      "module": null,
+      "name": "Switch to default content",
+      "type": "output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "action_name": "select_dropdown_by_value",
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "default_arguments": [],
+      "extra_arguments": [9],
+      "extra_download_assets": "",
+      "initial_config": null,
+      "is_default": false,
+      "is_function": true,
+      "module": null,
+      "name": "Select dropdown by value",
+      "type": "input-output",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.component",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "components": [1, 10, 11, 12],
       "created_at": "2025-05-21 21:14:59.314899+00:00",
-      "name": "Navigate",
-      "updated_at": "2025-07-20 21:53:35.549496+00:00"
+      "name": "Navigation",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
     },
     "model": "workflow_builder_config_app.category",
     "pk": 1
   },
   {
     "fields": {
-      "components": [
-        2,
-        3,
-        4
-      ],
+      "components": [2, 3, 4],
       "created_at": "2025-05-21 21:16:07.741665+00:00",
       "name": "Selectors",
       "updated_at": "2025-07-20 21:53:35.590683+00:00"
@@ -261,34 +475,27 @@
   },
   {
     "fields": {
-      "components": [
-        5
-      ],
+      "components": [5, 13, 14],
       "created_at": "2025-05-21 21:16:53.465819+00:00",
-      "name": "actions",
-      "updated_at": "2025-07-20 21:53:35.617080+00:00"
+      "name": "Actions",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
     },
     "model": "workflow_builder_config_app.category",
     "pk": 3
   },
   {
     "fields": {
-      "components": [
-        6,
-        7
-      ],
+      "components": [6, 7, 15, 16],
       "created_at": "2025-05-21 21:17:34.745149+00:00",
-      "name": "assertion",
-      "updated_at": "2025-07-20 21:53:35.658580+00:00"
+      "name": "Assertions",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
     },
     "model": "workflow_builder_config_app.category",
     "pk": 4
   },
   {
     "fields": {
-      "components": [
-        8
-      ],
+      "components": [8],
       "created_at": "2025-05-21 21:18:05.514339+00:00",
       "name": "System",
       "updated_at": "2025-07-20 21:53:35.686256+00:00"
@@ -298,26 +505,27 @@
   },
   {
     "fields": {
-      "components": [
-        9
-      ],
+      "components": [9, 19],
       "created_at": "2025-05-24 18:28:37.865280+00:00",
       "name": "Form",
-      "updated_at": "2025-07-20 21:53:35.730758+00:00"
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
     },
     "model": "workflow_builder_config_app.category",
     "pk": 6
   },
   {
     "fields": {
-      "categories": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ],
+      "components": [17, 18],
+      "created_at": "2025-07-27 00:00:00.000000+00:00",
+      "name": "Frames",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00"
+    },
+    "model": "workflow_builder_config_app.category",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "categories": [1, 2, 3, 4, 5, 6, 7],
       "created_at": "2025-05-21 21:16:09.634410+00:00",
       "dependencies": [],
       "extra_download_assets": "",
@@ -326,7 +534,7 @@
       "is_active": true,
       "name": "Selenium",
       "provider_type": "Web",
-      "updated_at": "2025-07-20 21:53:35.755382+00:00",
+      "updated_at": "2025-07-27 00:00:00.000000+00:00",
       "version": "4.10.0"
     },
     "model": "workflow_builder_config_app.provider",
