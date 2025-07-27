@@ -1,0 +1,54 @@
+replicaCount: 1
+
+saasBackend:
+  name: saas-app-backend
+  group: app
+  container:
+    image: ghcr.io/um-org/no-code-testing-app
+    tag: v1.0.3
+    port: 8000
+  service:
+    type: NodePort
+    port: 30010
+    protocol: TCP
+    targetPort: 8000
+    nodePort: 30010
+  volume:
+    name: saas-app-backend-storage
+    kind: PersistentVolumeClaim
+    mountPath: /app/static
+    pvc:
+      name: saas-app-backend-storage-persistent-volume-claim
+      accessMode: ReadWriteOnce
+      storage: 4Gi
+  config:
+    name: saas-app-backend-config
+    data:
+      POSTGRES_DB: no_code_app_dev
+      POSTGRES_PORT: "5432"
+      POSTGRES_HOST: postgres.default.svc.cluster.local
+      MAIL_JET_FROM_EMAIL: "mouhib.sellami.2@gmail.com"
+      APP_FRONT_URL: http://dg1j75rwzy.oxahost.svr.computeservers.oxa.host/
+      APP_NAME: "Auto test builder"
+      MINIO_HOST: "minio-clusterip.default.svc.cluster.local:9000"
+      MINIO_HOST_PROTOCOL: "http://"
+      MINIO_PUBLIC_HOST: dg1j75rwzy.oxahost.svr.computeservers.oxa.host/minio
+      MINIO_DEFAULT_BUCKETS: server-bucket
+      MQTT_BROKER_HOST: "emqx-clusterip.default.svc.cluster.local"
+      EMQX_MQTT_TCP_PORT: "1883"
+      APP_URL: "dg1j75rwzy.oxahost.svr.computeservers.oxa.host"
+  secretConfig:
+    name: saas-app-backend-secret-config
+    data:
+      APP_ROOT_USER: cm9vdA==
+      APP_ROOT_PASSWORD: cm9vdA==
+      APP_ROOT_EMAIL: cm9vdEBsb2NhbGhvc3Q=
+      POSTGRES_USER: cG9zdGdyZXM=
+      POSTGRES_PASSWORD: cG9zdGdyZXM=
+      MINIO_ACCESS_KEY: dzlONHRySnd3TlYxVGtrRkVocUk=
+      MINIO_SECRET_KEY: TXFEZmE1WHZDUUhzM1lQQ0xlWWtkdzlkcDBNcHYyUVBvZHBCVVVQRQ==
+      MAIL_JET_SECRET_KEY: NThkYjI0NmNjMDY3NDFkYTMxNWJkNjNkOTIwNjdlYTU=
+      MAIL_JET_API_KEY: YTc2OWVhY2U5Y2EyNTEyMmQ3MWU3ZWM1NGM3Zjc3MWQ=
+      SECRET_KEY: dGlueS1rZXkxMjM0
+      EMQX_DEFAULT_USERNAME: YWRtaW4=
+      EMQX_DEFAULT_PASSWORD: YWRtaW4xMjM=

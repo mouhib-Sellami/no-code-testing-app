@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.saasBackend.name }}-clusterip
+  labels: 
+    group: {{ .Values.saasBackend.group }}
+spec:
+  type: ClusterIP
+  selector:             
+    app: {{ .Values.saasBackend.name }}
+  ports:
+    - port: {{ .Values.saasBackend.container.port  }}       
+      targetPort: {{ .Values.saasBackend.service.targetPort }}
+      protocol: TCP

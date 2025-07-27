@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from app_tenant import models
 from slugify import slugify
+import os
 
 
 class BaseDomainSerializer(serializers.ModelSerializer):
@@ -44,7 +45,7 @@ class OrganizationSignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tenant
-        fields = ('name', 'email','org_pic')
+        fields = ('name', 'email', 'org_pic')
 
     def validate_name(self, value):
         slug = slugify(value, allow_unicode=False)
@@ -70,7 +71,7 @@ class OrganizationSignUpSerializer(serializers.ModelSerializer):
 
         data['slug'] = slug
         data['schema_name'] = schema_name
-        data['domain_name'] = domain_name + ".localhost"
+        data['domain_name'] = domain_name + "."+os.getenv('APP_URL')
         return data
 
     def create(self, validated_data):

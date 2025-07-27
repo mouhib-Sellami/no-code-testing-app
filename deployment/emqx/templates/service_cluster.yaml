@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.emqx.name }}-clusterip
+  labels: 
+    group: {{ .Values.emqx.group }}
+spec:
+  type: ClusterIP
+  selector:             
+    app: {{ .Values.emqx.name }}
+  ports:
+    - port: {{ .Values.emqx.service.ports.mqttTcp.port  }}       
+      targetPort: {{ .Values.emqx.service.ports.mqttTcp.targetPort }}
+      protocol: TCP
