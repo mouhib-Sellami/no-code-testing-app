@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.saasBackend.name }}
+  labels: 
+    group: {{ .Values.saasBackend.group }}
+spec:
+  type: {{ .Values.saasBackend.service.type }}
+  selector:             
+    app: {{ .Values.saasBackend.name }}
+  ports:
+    - protocol: {{ .Values.saasBackend.service.protocol }}
+      port: {{ .Values.saasBackend.service.port }}
+      targetPort: {{ .Values.saasBackend.service.targetPort }}
+      nodePort: {{ .Values.saasBackend.service.nodePort }}

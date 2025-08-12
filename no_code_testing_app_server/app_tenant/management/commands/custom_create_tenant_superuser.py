@@ -47,8 +47,10 @@ class Command(BaseCommand):
         try:
             with schema_context(schema_name):
                 if not User.objects.filter(username=username).exists():
-                    User.objects.create_superuser(
+                    user = User.objects.create_superuser(
                         username=username, password=password, email=email)
+                    user.set_password(password)
+                    user.save(update_fields=['password'])
                     self.stdout.write(self.style.SUCCESS(
                         f"Superuser '{username}' created on schema '{schema_name}'"
                     ))
