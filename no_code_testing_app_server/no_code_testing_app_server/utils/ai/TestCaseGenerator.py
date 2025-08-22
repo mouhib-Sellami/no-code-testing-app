@@ -1,6 +1,6 @@
 from huggingface_hub import InferenceClient
 from typing import Optional, Dict, Any
-from .vector import retriever
+# from .vector import retriever
 from no_code_testing_app_server.patterns.Singleton import singleton
 import json
 import os
