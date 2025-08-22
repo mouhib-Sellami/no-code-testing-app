@@ -3,3 +3,4 @@ from . import models
 
 
 admin.site.register(models.MailJobs)
+admin.site.register(models.AiGenerationJob)

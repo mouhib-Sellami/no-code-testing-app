@@ -90,3 +90,8 @@ class Provider(BaseModel):
 
     def __str__(self):
         return self.name + " - " + self.version
+    
+    def get_components_by_type(self):
+        return Component.objects.filter(
+            component_providers__in=self.categories.all()
+        ).distinct().all()

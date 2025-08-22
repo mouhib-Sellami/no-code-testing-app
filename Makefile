@@ -17,7 +17,7 @@ build:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache $(c)
 
 start:
-	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d $(c)
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d --remove-orphans $(c)
 
 stop:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) stop $(c)

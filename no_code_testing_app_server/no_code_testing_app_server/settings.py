@@ -14,7 +14,8 @@ from pathlib import Path
 import os
 from no_code_testing_app_server.config import *
 from .logger import LOGGING
-
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

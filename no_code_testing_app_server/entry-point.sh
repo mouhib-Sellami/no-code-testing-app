@@ -7,6 +7,8 @@ python3 manage.py collectstatic --noinput --skip-check
 python3 manage.py create_public_tenant --domain_url $APP_URL --owner_email admin@domain.com --skip-check
 python manage.py custom_create_tenant_superuser --schema public --skip-checks
 
+export HF_API_TOKEN=$HUGGING_FACES_API_KEY
+
 gunicorn \
   --reload \
   --workers 4 \

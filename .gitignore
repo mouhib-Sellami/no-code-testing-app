@@ -6,3 +6,4 @@ env
 no_code_testing_app_server/static
 no_code_testing_app_server/logs
 no_code_testing_app_server/staticfiles
+no_code_testing_app_server/chrome_langchain_db

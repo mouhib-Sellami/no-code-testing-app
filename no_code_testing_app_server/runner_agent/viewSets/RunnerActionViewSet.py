@@ -23,16 +23,20 @@ class RunnerActionViewSet(GenericViewSet, mixins.UpdateModelMixin):
 
     @action(url_path="", url_name="", methods=['POST'], serializer_class=serializers.RunnerAgentSerializer, detail=False)
     def register(self, request):
-        runner_agent: models.RunnerAgent = request.runner_agent
-        update_fields = ['status']
-        for key, value in request.data.items():
-            setattr(runner_agent, key, value)
-            update_fields.append(key)
-        runner_agent.status = models.RunnerAgentStatus.INITIALIZING
-        runner_agent.save(update_fields=update_fields)
-        result = serializers.RunnerAgentSerializer(runner_agent).data
-        result.update({'tenant_id': request.tenant.id})
-        return HttpResponse(json.dumps(result), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        try:
+            runner_agent: models.RunnerAgent = request.runner_agent
+            update_fields = ['status']
+            for key, value in request.data.items():
+                setattr(runner_agent, key, value)
+                update_fields.append(key)
+            runner_agent.status = models.RunnerAgentStatus.INITIALIZING
+            runner_agent.save(update_fields=update_fields)
+            result = serializers.RunnerAgentSerializer(runner_agent).data
+            result.update({'tenant_id': request.tenant.id})
+            return HttpResponse(json.dumps(result), status=status.HTTP_200_OK, content_type=CONTENT_TYPE)
+        except Exception as e:
+            print(e)
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
 
     @action(url_path="update-execution-status", url_name="update-execution-status", methods=['PUT'], detail=False)
     def update_execution_status(self, request):
