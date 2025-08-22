@@ -1,0 +1,1115 @@
+[
+    {
+        "prompt": "This test case represents a login flow for SauceDemo with sequential component IDs. The flow includes navigation, credential entry (username: 'standard_user', password: 'secret_sauce'), and login button click. Components are numbered (comp_1 to comp_7) with clear dependencies.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to SauceDemo",
+                    "action": "get",
+                    "url": "https://www.saucedemo.com/",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find username field",
+                    "action": "find_element",
+                    "locator": "user-name",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Enter username",
+                    "action": "send_keys",
+                    "value": "standard_user",
+                    "type": "input_action"
+                },
+                "comp_4": {
+                    "name": "Find password field",
+                    "action": "find_element",
+                    "locator": "password",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Enter password",
+                    "action": "send_keys",
+                    "value": "secret_sauce",
+                    "type": "input_action"
+                },
+                "comp_6": {
+                    "name": "Find login button",
+                    "action": "find_element",
+                    "locator": "login-button",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_7": {
+                    "name": "Click login",
+                    "action": "click",
+                    "type": "interaction"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_1",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_1",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_4",
+                    "type": "RUN_AFTER"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_5",
+                    "type": "RUN_AFTER"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_7",
+                    "type": "RUN_AFTER"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case represents a search flow on DuckDuckGo. The flow includes navigation, entering a search query 'OpenAI GPT-5', submitting the search, and verifying the results page. Components are numbered (comp_1 to comp_6) with logical dependencies.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to DuckDuckGo",
+                    "action": "get",
+                    "url": "https://duckduckgo.com/",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find search input field",
+                    "action": "find_element",
+                    "locator": "searchbox_input",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Enter search query",
+                    "action": "send_keys",
+                    "value": "OpenAI GPT-5",
+                    "type": "input_action"
+                },
+                "comp_4": {
+                    "name": "Find search button",
+                    "action": "find_element",
+                    "locator": "search_button_homepage",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Click search",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_6": {
+                    "name": "Verify results contain query",
+                    "action": "assert_element_contains_text",
+                    "locator": "links",
+                    "locator_type": "class name",
+                    "value": "OpenAI",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_1",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case automates a registration flow on a demo e-commerce site. It includes navigating to the registration page, filling name, email, and password, and submitting the form. Components are numbered (comp_1 to comp_8) with sequential dependencies.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to registration page",
+                    "action": "get",
+                    "url": "https://demo.opencart.com/index.php?route=account/register",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find first name field",
+                    "action": "find_element",
+                    "locator": "input-firstname",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Enter first name",
+                    "action": "send_keys",
+                    "value": "John",
+                    "type": "input_action"
+                },
+                "comp_4": {
+                    "name": "Find email field",
+                    "action": "find_element",
+                    "locator": "input-email",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Enter email",
+                    "action": "send_keys",
+                    "value": "john.doe@example.com",
+                    "type": "input_action"
+                },
+                "comp_6": {
+                    "name": "Find password field",
+                    "action": "find_element",
+                    "locator": "input-password",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_7": {
+                    "name": "Enter password",
+                    "action": "send_keys",
+                    "value": "StrongPass123",
+                    "type": "input_action"
+                },
+                "comp_8": {
+                    "name": "Click submit",
+                    "action": "click",
+                    "type": "interaction"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_1",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_1",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_7",
+                    "to": "comp_8",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case checks adding a product to a shopping cart on SauceDemo. It includes logging in, finding a product, adding it to the cart, and verifying cart contents. Components are numbered (comp_1 to comp_10) with conditional dependencies.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to SauceDemo",
+                    "action": "get",
+                    "url": "https://www.saucedemo.com/",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find username field",
+                    "action": "find_element",
+                    "locator": "user-name",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Enter username",
+                    "action": "send_keys",
+                    "value": "standard_user",
+                    "type": "input_action"
+                },
+                "comp_4": {
+                    "name": "Find password field",
+                    "action": "find_element",
+                    "locator": "password",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Enter password",
+                    "action": "send_keys",
+                    "value": "secret_sauce",
+                    "type": "input_action"
+                },
+                "comp_6": {
+                    "name": "Click login",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_7": {
+                    "name": "Find first product Add to Cart button",
+                    "action": "find_element",
+                    "locator": "add-to-cart-sauce-labs-backpack",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_8": {
+                    "name": "Click add to cart",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_9": {
+                    "name": "Navigate to cart",
+                    "action": "find_element",
+                    "locator": "shopping_cart_container",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_10": {
+                    "name": "Verify product in cart",
+                    "action": "assert_element_contains_text",
+                    "locator": "cart_item",
+                    "locator_type": "class name",
+                    "value": "Sauce Labs Backpack",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_1",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_7",
+                    "to": "comp_8",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_8",
+                    "to": "comp_9",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_9",
+                    "to": "comp_10",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a password reset flow. It includes navigating to the forgot password page, entering an email, submitting the request, and verifying the confirmation message.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to login page",
+                    "action": "get",
+                    "url": "https://example.com/login",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find forgot password link",
+                    "action": "find_element",
+                    "locator": "forgot-password",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Click forgot password",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_4": {
+                    "name": "Find email field",
+                    "action": "find_element",
+                    "locator": "reset-email",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Enter email",
+                    "action": "send_keys",
+                    "value": "user@example.com",
+                    "type": "input_action"
+                },
+                "comp_6": {
+                    "name": "Find submit button",
+                    "action": "find_element",
+                    "locator": "reset-submit",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_7": {
+                    "name": "Click submit",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_8": {
+                    "name": "Verify success message",
+                    "action": "assert_element_contains_text",
+                    "locator": "alert-success",
+                    "locator_type": "class",
+                    "value": "reset link sent",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_7",
+                    "to": "comp_8",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a multi-page form submission with validation. It includes navigating through multiple form steps, entering data, and verifying validation messages.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to form start page",
+                    "action": "get",
+                    "url": "https://example.com/form",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find first name field",
+                    "action": "find_element",
+                    "locator": "firstName",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Enter first name",
+                    "action": "send_keys",
+                    "value": "Test",
+                    "type": "input_action"
+                },
+                "comp_4": {
+                    "name": "Find next button",
+                    "action": "find_element",
+                    "locator": "nextBtn",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Click next",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_6": {
+                    "name": "Find email field",
+                    "action": "find_element",
+                    "locator": "email",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_7": {
+                    "name": "Enter invalid email",
+                    "action": "send_keys",
+                    "value": "invalid-email",
+                    "type": "input_action"
+                },
+                "comp_8": {
+                    "name": "Find next button",
+                    "action": "find_element",
+                    "locator": "nextBtn",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_9": {
+                    "name": "Click next",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_10": {
+                    "name": "Verify validation error",
+                    "action": "assert_element_contains_text",
+                    "locator": "error-message",
+                    "locator_type": "class",
+                    "value": "valid email",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_7",
+                    "to": "comp_8",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_8",
+                    "to": "comp_9",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_9",
+                    "to": "comp_10",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a file upload functionality. It includes navigating to the upload page, selecting a file, submitting the form, and verifying the upload confirmation.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to upload page",
+                    "action": "get",
+                    "url": "https://example.com/upload",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find file input",
+                    "action": "find_element",
+                    "locator": "file-upload",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Upload test file",
+                    "action": "send_keys",
+                    "value": "/path/to/testfile.txt",
+                    "type": "input_action"
+                },
+                "comp_4": {
+                    "name": "Find submit button",
+                    "action": "find_element",
+                    "locator": "upload-submit",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Click submit",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_6": {
+                    "name": "Verify upload success",
+                    "action": "assert_element_contains_text",
+                    "locator": "upload-status",
+                    "locator_type": "id",
+                    "value": "upload completed",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a dropdown selection flow. It includes navigating to a page, selecting options from dropdown menus, and verifying the selection results.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to demo page",
+                    "action": "get",
+                    "url": "https://example.com/dropdown-demo",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find country dropdown",
+                    "action": "find_element",
+                    "locator": "country-select",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Select country",
+                    "action": "select_by_visible_text",
+                    "value": "Canada",
+                    "type": "interaction"
+                },
+                "comp_4": {
+                    "name": "Find state dropdown",
+                    "action": "find_element",
+                    "locator": "state-select",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Select state",
+                    "action": "select_by_value",
+                    "value": "ON",
+                    "type": "interaction"
+                },
+                "comp_6": {
+                    "name": "Find submit button",
+                    "action": "find_element",
+                    "locator": "dropdown-submit",
+                    "locator_type": "id",
+                    "type": "element_lookup"
+                },
+                "comp_7": {
+                    "name": "Click submit",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_8": {
+                    "name": "Verify selection results",
+                    "action": "assert_element_contains_text",
+                    "locator": "results-panel",
+                    "locator_type": "id",
+                    "value": "Canada, Ontario",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_7",
+                    "to": "comp_8",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a table sorting functionality. It includes navigating to a page, clicking sort buttons, and verifying the sort order of table data.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to table demo",
+                    "action": "get",
+                    "url": "https://example.com/sortable-table",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find name column header",
+                    "action": "find_element",
+                    "locator": "//th[contains(.,'Name')]",
+                    "locator_type": "xpath",
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Click to sort by name",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_4": {
+                    "name": "Get first row name",
+                    "action": "get_element_text",
+                    "locator": "//tbody/tr[1]/td[1]",
+                    "locator_type": "xpath",
+                    "type": "assertion"
+                },
+                "comp_5": {
+                    "name": "Verify sort order",
+                    "action": "assert_text_matches",
+                    "value": "^A.*",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a password reset flow using class and name locators with indexes. It includes navigating to the forgot password page, entering an email, and submitting the request.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to login page",
+                    "action": "get",
+                    "url": "https://example.com/login",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find forgot password link by class",
+                    "action": "find_element",
+                    "locator": "forgot-password-link",
+                    "locator_type": "class name",
+                    "index": 0,
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Click forgot password",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_4": {
+                    "name": "Find email field by name with index",
+                    "action": "find_element",
+                    "locator": "email",
+                    "locator_type": "name",
+                    "index": 1,
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Enter email",
+                    "action": "send_keys",
+                    "value": "user@example.com",
+                    "type": "input_action"
+                },
+                "comp_6": {
+                    "name": "Find submit button by class",
+                    "action": "find_element",
+                    "locator": "btn-submit",
+                    "locator_type": "class name",
+                    "index": 0,
+                    "type": "element_lookup"
+                },
+                "comp_7": {
+                    "name": "Click submit",
+                    "action": "click",
+                    "type": "interaction"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_6",
+                    "to": "comp_7",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a product listing page using class name locators with indexes. It checks product sorting and displays details.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to products page",
+                    "action": "get",
+                    "url": "https://example.com/products",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find sort dropdown by class",
+                    "action": "find_element",
+                    "locator": "sort-options",
+                    "locator_type": "class name",
+                    "index": 0,
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Select price high-to-low",
+                    "action": "select_by_visible_text",
+                    "value": "Price (High to Low)",
+                    "type": "interaction"
+                },
+                "comp_4": {
+                    "name": "Find first product by class",
+                    "action": "find_element",
+                    "locator": "product-item",
+                    "locator_type": "class name",
+                    "index": 0,
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Verify product price",
+                    "action": "assert_element_contains_text",
+                    "locator": "price",
+                    "locator_type": "class name",
+                    "index": 0,
+                    "value": "$",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a navigation menu using name locators with indexes. It checks menu items and submenu functionality.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to homepage",
+                    "action": "get",
+                    "url": "https://example.com",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find main menu by name",
+                    "action": "find_element",
+                    "locator": "main-menu",
+                    "locator_type": "name",
+                    "index": 0,
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Hover over products",
+                    "action": "hover",
+                    "type": "interaction"
+                },
+                "comp_4": {
+                    "name": "Find submenu item by class",
+                    "action": "find_element",
+                    "locator": "submenu-item",
+                    "locator_type": "class name",
+                    "index": 2,
+                    "type": "element_lookup"
+                },
+                "comp_5": {
+                    "name": "Click submenu item",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_6": {
+                    "name": "Verify page title",
+                    "action": "assert_title_contains",
+                    "value": "Products",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_5",
+                    "to": "comp_6",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    },
+    {
+        "prompt": "This test case verifies a pagination control using class name locators with indexes. It checks page navigation and active page highlighting.",
+        "test": {
+            "components": {
+                "comp_1": {
+                    "name": "Navigate to search results",
+                    "action": "get",
+                    "url": "https://example.com/search?q=test",
+                    "type": "navigation"
+                },
+                "comp_2": {
+                    "name": "Find pagination control by class",
+                    "action": "find_element",
+                    "locator": "pagination",
+                    "locator_type": "class name",
+                    "index": 0,
+                    "type": "element_lookup"
+                },
+                "comp_3": {
+                    "name": "Find page 2 link by class",
+                    "action": "find_element",
+                    "locator": "page-link",
+                    "locator_type": "class name",
+                    "index": 1,
+                    "type": "element_lookup"
+                },
+                "comp_4": {
+                    "name": "Click page 2",
+                    "action": "click",
+                    "type": "interaction"
+                },
+                "comp_5": {
+                    "name": "Verify active page by class",
+                    "action": "assert_element_has_class",
+                    "locator": "page-item",
+                    "locator_type": "class name",
+                    "index": 1,
+                    "value": "active",
+                    "type": "assertion"
+                }
+            },
+            "dependencies": [
+                {
+                    "from": "comp_1",
+                    "to": "comp_2",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_2",
+                    "to": "comp_3",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_3",
+                    "to": "comp_4",
+                    "type": "DEPENDENCY"
+                },
+                {
+                    "from": "comp_4",
+                    "to": "comp_5",
+                    "type": "DEPENDENCY"
+                }
+            ]
+        }
+    }
+]
