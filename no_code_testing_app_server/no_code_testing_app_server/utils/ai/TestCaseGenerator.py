@@ -4,26 +4,73 @@ from typing import Optional, Dict, Any
 from no_code_testing_app_server.patterns.Singleton import singleton
 import json
 import os
+import re
 from dotenv import load_dotenv
-load_dotenv()
+from gradio_client import Client
 
+load_dotenv()
+base_path = os.path.join(os.getcwd(), 'media', 'cases.json')
+
+knowledge_base = json.load(open(base_path, 'r'))
 
 @singleton
 class TestCaseGenerator:
     def __init__(self):
-        self.client = InferenceClient(
-            api_key=os.getenv('HUGGING_FACES_API_KEY'))
+        self.client = Client("Qwen/Qwen3-Demo")
+
         self._init_prompt()
+        
+    def extract_json_from_response(self,response):
+        try:
+            if isinstance(response, tuple) and len(response) > 1:
+                messages_data = response[1]
+                
+                if isinstance(messages_data, dict) and 'value' in messages_data:
+                    messages = messages_data['value']
+                    
+                    for message in messages:
+                        if (isinstance(message, dict) and 
+                            message.get('role') == 'assistant' and 
+                            'content' in message):
+                            
+                            content = message['content']
+                            
+                            if isinstance(content, list):
+                                for content_block in content:
+                                    if (isinstance(content_block, dict) and 
+                                        content_block.get('type') == 'text' and 
+                                        'content' in content_block):
+                                        
+                                        text_content = content_block['content']
+                                        
+                                        json_match = re.search(r'\{[\s\S]*\}', text_content)
+                                        if json_match:
+                                            try:
+                                                return json.loads(json_match.group())
+                                            except json.JSONDecodeError:
+                                                continue
+            
+            return None
+        except Exception as e:
+            print(f"Error extracting JSON: {e}")
+            return None
 
     def _generate_response(self, prompt):
-        response = self.client.chat_completion(
-            model="Qwen/Qwen3-Coder-480B-A35B-Instruct",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1000,
-            temperature=0.1
-        )
+        # response = self.client.chat_completion(
+        #     model="Qwen/Qwen3-Coder-480B-A35B-Instruct",
+        #     messages=[{"role": "user", "content": prompt}],
+        #     max_tokens=1000,
+        #     temperature=0.1
+        # )
 
-        return response.choices[0].message.content
+        # return response.choices[0].message.content
+        result = self.client.predict(
+        input_value=prompt,
+        settings_form_value={"model":"qwen3-235b-a22b","sys_prompt":"You are a helpful and harmless assistant.","thinking_budget":38},
+        api_name="/add_message"
+        )
+        return self.extract_json_from_response(result)
+
 
     def _init_prompt(self):
         self.base_prompt = """
@@ -89,10 +136,10 @@ class TestCaseGenerator:
     def run(self, user_prompt: str, html_content: str, page_url: str) -> Optional[Dict[str, Any]]:
         # examples = retriever.invoke(user_prompt)
         test_case = self.generate_test_case(
-            user_prompt, [], html_content, page_url)
+            user_prompt=user_prompt, examples=knowledge_base,html_content= html_content, page_url=page_url)
 
         try:
-            parsed_result = json.loads(test_case)
+            parsed_result =test_case
             print("Parsed JSON:", parsed_result)
             return parsed_result
         except json.JSONDecodeError as e:
