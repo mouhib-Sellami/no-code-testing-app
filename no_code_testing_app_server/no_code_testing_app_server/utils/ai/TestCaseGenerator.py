@@ -136,7 +136,7 @@ class TestCaseGenerator:
     def run(self, user_prompt: str, html_content: str, page_url: str) -> Optional[Dict[str, Any]]:
         # examples = retriever.invoke(user_prompt)
         test_case = self.generate_test_case(
-            user_prompt=user_prompt, examples=knowledge_base,html_content= html_content, page_url=page_url)
+            user_prompt=user_prompt, examples=[],html_content= html_content, page_url=page_url)
 
         try:
             parsed_result =test_case

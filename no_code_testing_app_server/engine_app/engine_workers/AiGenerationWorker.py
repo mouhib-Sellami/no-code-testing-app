@@ -73,23 +73,25 @@ class AiGenerationWorker(Worker):
                 if value.get("name"):
                     project_component.name = value["name"]
                     project_component.save(update_fields=["name"])
+                try:
+                    if value.get('type') == 'navigation':
+                        extra_kwargs = project_component.extra_arguments.first()
+                        extra_kwargs.value = value['url']
+                        extra_kwargs.save(update_fields=['value'])
 
-                if value.get('type') == 'navigation':
-                    extra_kwargs = project_component.extra_arguments.first()
-                    extra_kwargs.value = value['url']
-                    extra_kwargs.save(update_fields=['value'])
+                    elif value.get('type') == "element_lookup":
+                        extra_kwargs = project_component.extra_arguments.first()
+                        extra_kwargs.value = value['locator']
+                        extra_kwargs.save(update_fields=['value'])
 
-                elif value.get('type') == "element_lookup":
-                    extra_kwargs = project_component.extra_arguments.first()
-                    extra_kwargs.value = value['locator']
-                    extra_kwargs.save(update_fields=['value'])
+                    elif value.get('type') == "input_action":
+                        extra_kwargs = project_component.extra_arguments.first()
+                        extra_kwargs.value = value['value']
+                        extra_kwargs.save(update_fields=['value'])
 
-                elif value.get('type') == "input_action":
-                    extra_kwargs = project_component.extra_arguments.first()
-                    extra_kwargs.value = value['value']
-                    extra_kwargs.save(update_fields=['value'])
-
-                comp_map[key] = project_component
+                    comp_map[key] = project_component
+                except:
+                    pass
                 
             for dep in deps:
                 source_key = dep["from"]
