@@ -22,7 +22,8 @@ class EmailWorker(Worker):
         job_payload: models.MailJobs = task.job_payload
         user_parsed = serializers.BaseUserSerializer(
             job_payload.receiver, context={'extra_fields': ['reset_token']}).data
+        print(job_payload.email_content)
         email_to_send = generate_email(
-            receiver=user_parsed['email'], type=job_payload.type, **user_parsed)
+            receiver=user_parsed['email'], type=job_payload.type, email_content=job_payload.email_content, **user_parsed)
 
         mail_jet_client.send_email(email_to_send)

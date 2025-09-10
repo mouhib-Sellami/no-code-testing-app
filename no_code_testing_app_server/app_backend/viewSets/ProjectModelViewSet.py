@@ -9,7 +9,9 @@ from no_code_testing_app_server.shared import BaseModelViewSet
 from django.core.exceptions import ObjectDoesNotExist
 from no_code_testing_app_server.utils.MqttClient import MQTTClient
 from engine_app.engines.AIEngine import AIEngine
-from engine_app.models import AiGenerationJob
+from engine_app.engines.AIAuditEngine import AIAuditEngine
+from engine_app.models import AiGenerationJob, AiAuditJob
+
 logger = logging.getLogger('no_code_testing_app')
 CONTENT_TYPE = "application/json"
 
@@ -106,6 +108,22 @@ class ProjectModelViewSet(BaseModelViewSet):
             job.save()
             ai_engine: AIEngine = AIEngine.get_instance()
             ai_engine.add_task(job=job, delete_when_finish=False)
+            return HttpResponse(status=status.HTTP_201_CREATED, content_type=CONTENT_TYPE)
+        except Exception as e:
+            print(e)
+            logger.exception(str(e))
+            return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type=CONTENT_TYPE)
+
+    @action(methods=['POST'], url_path='ai-audit-generate', url_name='ai-audit-generate', detail=False)
+    def ai_audit_generate(self, request):
+        try:
+
+            job = AiAuditJob()
+            job.html_content = request.data['html_content']
+            job.user = request.user
+            job.save()
+            ai_engine: AIAuditEngine = AIAuditEngine.get_instance()
+            ai_engine.add_task(job=job, delete_when_finish=False, new=True)
             return HttpResponse(status=status.HTTP_201_CREATED, content_type=CONTENT_TYPE)
         except Exception as e:
             print(e)
